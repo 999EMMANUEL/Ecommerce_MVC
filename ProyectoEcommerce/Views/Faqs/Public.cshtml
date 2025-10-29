@@ -1,0 +1,119 @@
+﻿@model IEnumerable<ProyectoEcommerce.Models.Faq>
+@using System.Linq
+
+@{
+    ViewData["Title"] = "Preguntas Frecuentes";
+
+    var items = (Model ?? Enumerable.Empty<ProyectoEcommerce.Models.Faq>())
+        .Select(f => new
+        {
+            Id = f.Id,
+            Category = string.IsNullOrWhiteSpace(f.Category) ? "General" : f.Category.Trim(),
+            f.Question,
+            f.Answer,
+            f.SortOrder
+        })
+        .OrderBy(f => f.Category)
+        .ThenBy(f => f.SortOrder)
+        .ThenBy(f => f.Id)
+        .ToList();
+
+    var groups = items.GroupBy(f => f.Category).ToList();
+
+    // Divide categorías en dos columnas balanceadas (alternando)
+    var leftGroups = groups.Where((g, i) => i % 2 == 0).ToList();
+    var rightGroups = groups.Where((g, i) => i % 2 == 1).ToList();
+}
+
+<section class="container py-5">
+    <h1 class="mb-4 text-center text-uppercase">Preguntas Frecuentes</h1>
+
+    @if (!groups.Any())
+    {
+        <div class="alert alert-info">Aún no hay preguntas publicadas.</div>
+    }
+    else
+    {
+        <div class="row g-4">
+            <!-- Columna izquierda -->
+            <div class="col-lg-6">
+                @foreach (var g in leftGroups)
+                {
+                    var accId = "accL-" + new string(g.Key.Where(char.IsLetterOrDigit).ToArray());
+                    <h2 class="h4 mt-2 mb-3 text-uppercase">@g.Key</h2>
+                    <div class="accordion mb-4" id="@accId">
+                        @{
+                            var i = 0;
+                        }
+                        @foreach (var f in g)
+                        {
+                            i++;
+                            var itemId = $"{accId}-item-{i}";
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="h-@itemId">
+                                    <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#@itemId"
+                                            aria-expanded="false" aria-controls="@itemId">
+                                        @f.Question
+                                    </button>
+                                </h2>
+                                <div id="@itemId" class="accordion-collapse collapse"
+                                     aria-labelledby="h-@itemId" data-bs-parent="#@accId">
+                                    <div class="accordion-body">
+                                        @Html.Raw(f.Answer)
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Columna derecha -->
+            <div class="col-lg-6">
+                @foreach (var g in rightGroups)
+                {
+                    var accId = "accR-" + new string(g.Key.Where(char.IsLetterOrDigit).ToArray());
+                    <h2 class="h4 mt-2 mb-3 text-uppercase">@g.Key</h2>
+                    <div class="accordion mb-4" id="@accId">
+                        @{
+                            var i = 0;
+                        }
+                        @foreach (var f in g)
+                        {
+                            i++;
+                            var itemId = $"{accId}-item-{i}";
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="h-@itemId">
+                                    <button class="accordion-button collapsed" type="button"
+                                            data-bs-toggle="collapse" data-bs-target="#@itemId"
+                                            aria-expanded="false" aria-controls="@itemId">
+                                        @f.Question
+                                    </button>
+                                </h2>
+                                <div id="@itemId" class="accordion-collapse collapse"
+                                     aria-labelledby="h-@itemId" data-bs-parent="#@accId">
+                                    <div class="accordion-body">
+                                        @Html.Raw(f.Answer)
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</section>
+
+@section Styles {
+    <style>
+        .accordion-button {
+            font-weight: 600;
+        }
+
+        .accordion-body {
+            line-height: 1.6;
+        }
+    </style>
+}

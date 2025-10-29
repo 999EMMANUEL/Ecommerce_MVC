@@ -1,0 +1,563 @@
+.main-content {
+    padding: 28px 0;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.section-title {
+    font-size: 26px;
+    text-align: center;
+    color: #1a365d; /* Azul marino principal */
+    margin-bottom: 22px;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(26, 54, 93, 0.1);
+}
+
+/* Grid */
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px;
+    align-items: start;
+}
+
+/* Tarjeta */
+.product-card {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(26, 54, 93, 0.08);
+}
+
+    .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 25px rgba(26, 54, 93, 0.15);
+        border-color: #dc2626; /* Borde rojo en hover */
+    }
+
+/* Enlace que cubre la tarjeta */
+.product-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    height: 100%;
+}
+
+/* Contenedor imagen: fija la altura para todas */
+.product-image {
+    width: 100%;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    position: relative;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+/* imagen dentro del marco */
+.card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover .card-img {
+    transform: scale(1.05);
+}
+
+/* Badge */
+.product-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+    background: #dc2626; /* Rojo InnovaTech */
+    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+}
+
+    .product-badge.available {
+        background: #059669; /* Verde complementario */
+        box-shadow: 0 2px 4px rgba(5, 150, 105, 0.3);
+    }
+
+/* Info */
+.product-info {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    background: #ffffff;
+}
+
+.product-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a365d; /* Azul marino principal */
+    margin-bottom: 8px;
+    line-height: 1.4;
+    transition: color 0.2s ease;
+}
+
+.product-link:hover .product-name {
+    color: #dc2626; /* Rojo en hover */
+}
+
+.product-availability {
+    font-size: 13px;
+    color: #64748b; /* Gris azulado */
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #059669; /* Verde disponible */
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2);
+}
+
+    .status-indicator.unavailable {
+        background: #dc2626; /* Rojo no disponible */
+        box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+    }
+
+.product-price {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a365d; /* Azul marino principal */
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid #e2e8f0;
+}
+
+/* Efectos adicionales */
+.product-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #dc2626 0%, #1a365d 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.product-card:hover::before {
+    opacity: 1;
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+    .product-image {
+        height: 140px;
+    }
+
+    .section-title {
+        font-size: 22px;
+    }
+
+    .product-info {
+        padding: 12px;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+    }
+}
+
+/* Animación de entrada */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.product-card {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+    /* Retraso escalonado para las tarjetas */
+    .product-card:nth-child(1) {
+        animation-delay: 0.1s;
+    }
+
+    .product-card:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .product-card:nth-child(3) {
+        animation-delay: 0.3s;
+    }
+
+    .product-card:nth-child(4) {
+        animation-delay: 0.4s;
+    }
+
+    .product-card:nth-child(5) {
+        animation-delay: 0.5s;
+    }
+
+    .product-card:nth-child(6) {
+        animation-delay: 0.6s;
+    }
+
+/* Ajustar el enlace para que NO cubra toda la tarjeta */
+.product-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    /* Quitar height: 100% para que no cubra el botón */
+}
+
+/* Nuevo contenedor para la info que sí está dentro del enlace */
+.product-info-clickable {
+    padding: 16px;
+    background: #ffffff;
+}
+
+/* Ajustar .product-info original para que no interfiera */
+.product-info {
+    /* Mantener para compatibilidad pero ya no se usa en la nueva estructura */
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    background: #ffffff;
+}
+
+/* Asegurar que las acciones del producto estén FUERA del enlace */
+.product-actions {
+    margin-top: 0; /* Quitar margin superior */
+    padding: 15px; /* Padding completo en lugar de solo top */
+    border-top: 1px solid #e2e8f0;
+    background: #ffffff; /* Asegurar fondo blanco */
+}
+
+.buy-btn {
+    width: 100%;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    color: #ffffff;
+    border: 2px solid #dc2626;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+    /* Importante: evitar que el botón sea parte del enlace */
+    position: relative;
+    z-index: 10;
+}
+
+    .buy-btn:hover {
+        background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+        border-color: #1a365d;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(26, 54, 93, 0.3);
+    }
+
+    .buy-btn:active {
+        transform: translateY(0);
+    }
+
+    .buy-btn.disabled {
+        background: #94a3b8;
+        border-color: #94a3b8;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+        .buy-btn.disabled:hover {
+            background: #94a3b8;
+            border-color: #94a3b8;
+            transform: none;
+        }
+
+/* Ajustar hover effects para que funcionen con la nueva estructura */
+.product-link:hover .product-name {
+    color: #dc2626; /* Rojo en hover */
+}
+
+/* Asegurar que el card tenga la estructura correcta */
+.product-card {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(26, 54, 93, 0.08);
+    position: relative; /* Para el z-index del botón */
+}
+
+    .product-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 25px rgba(26, 54, 93, 0.15);
+        border-color: #dc2626; /* Borde rojo en hover */
+    }
+
+/* --- Sección Reseñas (Home) --- */
+.user-reviews-section {
+    margin: 36px auto;
+    padding: 24px;
+    max-width: 1100px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(250,250,252,0.9));
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(13,38,63,0.06);
+}
+
+.reviews-title {
+    font-size: 22px;
+    color: #1a365d;
+    margin: 0 0 18px 0;
+    text-align: left;
+    font-weight: 700;
+}
+
+/* Grid de reseñas */
+.reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+}
+
+/* Card de reseña */
+.review-card {
+    background: #fff;
+    border: 1px solid #e8eef6;
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    min-height: 140px;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+    .review-card:focus,
+    .review-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 8px 22px rgba(26, 54, 93, 0.08);
+        outline: none;
+    }
+
+/* Header con avatar y meta */
+.review-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.review-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: linear-gradient(135deg,#2563eb,#dc2626);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    box-shadow: 0 2px 6px rgba(37,99,235,0.12);
+}
+
+.review-name {
+    display: block;
+    font-size: 14px;
+    color: #102a43;
+    font-weight: 700;
+}
+
+.review-payment {
+    font-size: 12px;
+    color: #5b6b77;
+    margin-top: 2px;
+}
+
+/* Texto de la reseña */
+.review-body {
+    font-size: 14px;
+    color: #334e68;
+    line-height: 1.45;
+    margin-top: 6px;
+    flex-grow: 1;
+}
+
+/* Método de pago resaltado */
+.payment-method {
+    font-weight: 700;
+    color: #0b6b4a;
+}
+
+/* Responsive: en móvil apilar y ajustar */
+@media (max-width: 540px) {
+    .user-reviews-section {
+        padding: 16px;
+    }
+
+    .reviews-grid {
+        gap: 12px;
+    }
+
+    .review-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 13px;
+    }
+
+    .reviews-title {
+        font-size: 20px;
+    }
+}
+
+/* --- Map & Branches layout (lado a lado) --- */
+.map-branches {
+    margin: 28px auto;
+    padding: 0 12px;
+    max-width: 1200px;
+}
+
+.map-branches-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px; /* mapa (flexible) + lista (ancha fija) */
+    gap: 18px;
+    align-items: start;
+}
+
+/* Ajuste cuando el viewport es pequeño: apilar */
+@media (max-width: 900px) {
+    .map-branches-grid {
+        grid-template-columns: 1fr; /* apila mapa arriba y sucursales abajo */
+    }
+}
+
+/* Mapa: wrapper responsivo */
+.map-wrapper {
+    width: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #e9eef6;
+    border: 1px solid #e2e8f0;
+}
+
+.responsive-iframe {
+    width: 100%;
+    height: 420px; /* altura por defecto en desktop */
+    border: 0;
+}
+
+/* Reducir altura en pantallas pequeñas */
+@media (max-width: 600px) {
+    .responsive-iframe {
+        height: 300px;
+    }
+}
+
+/* Branches column */
+.branches-column {
+    background: linear-gradient(180deg,#ffffff,#fbfdff);
+    border-radius: 10px;
+    border: 1px solid #e8eef6;
+    padding: 12px;
+    box-shadow: 0 6px 18px rgba(13,38,63,0.04);
+}
+
+/* Título */
+.branches-title {
+    font-size: 18px;
+    margin: 0 0 10px 0;
+    color: #102a43;
+    font-weight: 700;
+}
+
+/* Lista y tarjeta de sucursal */
+.branches-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.branch-card {
+    background: #fff;
+    border: 1px solid #eef6fb;
+    border-radius: 8px;
+    padding: 10px;
+    transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+    .branch-card:focus,
+    .branch-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 22px rgba(26,54,93,0.06);
+        outline: none;
+    }
+
+.branch-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.branch-name {
+    font-size: 14px;
+    color: #102a43;
+    font-weight: 700;
+}
+
+.branch-distance {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.branch-address,
+.branch-hours,
+.branch-phone,
+.branch-payment {
+    font-size: 13px;
+    color: #475569;
+    margin-top: 4px;
+}
+
+    /* enlaces telefónicos */
+    .branch-phone a {
+        color: #0b6b4a;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+/* pequeño detalle visual para métodos de pago */
+.branch-payment {
+    font-weight: 600;
+    color: #0b6b4a;
+}

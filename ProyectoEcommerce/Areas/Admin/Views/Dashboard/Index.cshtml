@@ -1,0 +1,50 @@
+﻿@model AdminDashboardVM
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1 class="h3 mb-4">Panel de control</h1>
+
+<div class="row g-3">
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="text-muted small">Usuarios</div>
+                <div class="h4 mb-0">@Model.TotalUsuarios</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="text-muted small">Pedidos hoy</div>
+                <div class="h4 mb-0">@Model.PedidosHoy</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="text-muted small">Ventas hoy</div>
+                <div class="h4 mb-0">₡@Model.VentasHoy.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-lg-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="text-muted small">Productos activos</div>
+                <div class="h4 mb-0">@Model.ProductosActivos</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header">Actividad reciente</div>
+        <div class="card-body">
+            <p class="mb-0 text-muted">Aquí puedes listar últimos pedidos, usuarios nuevos, etc.</p>
+        </div>
+    </div>
+</section>

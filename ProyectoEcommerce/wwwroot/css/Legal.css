@@ -1,0 +1,66 @@
+﻿/* wwwroot/css/Legal.css - Estilos para páginas legales */
+.legal-container {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin: 20px auto;
+    max-width: 1200px;
+}
+
+    .legal-container h1 {
+        color: #2c3e50;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+        margin-bottom: 30px;
+    }
+
+    .legal-container h2 {
+        color: #2c3e50;
+        margin-top: 25px;
+        margin-bottom: 15px;
+    }
+
+    .legal-container h3 {
+        color: #2c3e50;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    .legal-container p,
+    .legal-container ul,
+    .legal-container ol {
+        margin-bottom: 15px;
+    }
+
+    .legal-container ul,
+    .legal-container ol {
+        padding-left: 20px;
+    }
+
+    .legal-container li {
+        margin-bottom: 8px;
+    }
+
+.legal-section {
+    margin-bottom: 30px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
+@media (max-width: 768px) {
+    .legal-container {
+        padding: 20px;
+        margin: 10px;
+    }
+}

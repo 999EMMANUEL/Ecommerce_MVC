@@ -1,0 +1,97 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/ContactForm.css" asp-append-version="true" />
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <div class="contact-form-container">
+        <h2 class="contact-form-title">Contáctanos</h2>
+
+        <form id="contactForm" novalidate>
+            <div class="contact-form-group">
+                <label for="nombre" class="contact-form-label">
+                    Nombre completo <span class="contact-form-required">*</span>
+                </label>
+                <input type="text"
+                       id="nombre"
+                       name="nombre"
+                       class="contact-form-input"
+                       placeholder="Ingresa tu nombre completo">
+                <div class="contact-form-error" id="nombreError"></div>
+            </div>
+
+            <div class="contact-form-group">
+                <label for="email" class="contact-form-label">
+                    Correo electrónico <span class="contact-form-required">*</span>
+                </label>
+                <input type="email"
+                       id="email"
+                       name="email"
+                       class="contact-form-input"
+                       placeholder="ejemplo@correo.com">
+                <div class="contact-form-error" id="emailError"></div>
+            </div>
+
+            <div class="contact-form-group">
+                <label for="telefono" class="contact-form-label">
+                    Teléfono <span class="contact-form-required">*</span>
+                </label>
+                <input type="tel"
+                       id="telefono"
+                       name="telefono"
+                       class="contact-form-input"
+                       placeholder="Ej: +506 8888-8888">
+                <div class="contact-form-error" id="telefonoError"></div>
+            </div>
+
+            <div class="contact-form-group">
+                <label for="mensaje" class="contact-form-label">
+                    Mensaje <span class="contact-form-required">*</span>
+                </label>
+                <textarea id="mensaje"
+                          name="mensaje"
+                          class="contact-form-textarea"
+                          placeholder="Escribe tu consulta o mensaje aquí..."></textarea>
+                <div class="contact-form-error" id="mensajeError"></div>
+            </div>
+
+            <button type="submit" class="contact-form-submit" id="submitBtn">
+                Enviar consulta
+            </button>
+        </form>
+
+        <div class="contact-form-success" id="successMessage">
+            ¡Mensaje enviado correctamente! Te contactaremos pronto.
+        </div>
+
+        <div class="contact-form-footer">
+            <p>Los campos marcados con <span class="contact-form-required">*</span> son obligatorios</p>
+        </div>
+    </div>
+
+</body>
+</html>
+
+@section Scripts {
+    <!-- Referencia al archivo JavaScript externo -->
+    <script src="~/js/ContactForm.js" asp-append-version="true"></script>
+
+    <!-- Script de inicialización -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            new InnovaTechFormValidator('contactForm');
+        });
+    </script>
+}

@@ -1,0 +1,23 @@
+﻿@model IEnumerable<ProyectoEcommerce.Models.Category>
+@{
+    ViewData["Title"] = "Categorías";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@if (!(Model?.Any() ?? false))
+{
+    <p>No hay categorías disponibles.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var c in Model)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>@c.Name</span>
+                <a asp-action="Details" asp-route-id="@c.CategoryId" class="btn btn-sm btn-outline-secondary">Ver</a>
+            </li>
+        }
+    </ul>
+}

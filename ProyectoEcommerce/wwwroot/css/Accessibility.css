@@ -1,0 +1,291 @@
+﻿/* Accessibility.css - Estilos para el panel de accesibilidad */
+
+/* Botón de accesibilidad */
+.accessibility-btn {
+    background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+    border: 2px solid #1a365d;
+    color: #ffffff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(26, 54, 93, 0.3);
+    z-index: 10001;
+}
+
+    .accessibility-btn:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        border-color: #dc2626;
+        transform: scale(1.05);
+        box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4);
+    }
+
+/* Panel de accesibilidad */
+.accessibility-panel {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 10000;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+    border: 2px solid #1a365d;
+    min-width: 280px;
+    display: none;
+}
+
+    .accessibility-panel.is-open {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .accessibility-panel::before {
+        content: '♿ OPCIONES DE ACCESIBILIDAD';
+        display: block;
+        font-size: 12px;
+        font-weight: 800;
+        color: #dc2626;
+        text-align: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #dc2626;
+        letter-spacing: 1px;
+    }
+
+.option-group {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+    .option-group:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        text-align: center;
+    }
+
+    .option-group h4 {
+        margin-bottom: 12px;
+        color: #1a365d;
+        font-size: 15px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+.btn-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.font-size-btn, .contrast-btn {
+    padding: 8px 12px;
+    border: 2px solid #cbd5e1;
+    background: #f8fafc;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a365d;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    min-width: 60px;
+}
+
+    .font-size-btn:hover, .contrast-btn:hover {
+        border-color: #dc2626;
+        background: #fef2f2;
+        color: #dc2626;
+        transform: translateY(-2px);
+    }
+
+    .font-size-btn.active, .contrast-btn.active {
+        background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+        color: #ffffff;
+        border-color: #1a365d;
+        box-shadow: 0 2px 8px rgba(26, 54, 93, 0.3);
+    }
+
+#reset-accessibility {
+    background: transparent;
+    border: 2px solid #6c757d;
+    color: #6c757d;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+    #reset-accessibility:hover {
+        background: #6c757d;
+        color: white;
+    }
+
+/* ESTILOS DE ACCESIBILIDAD - TAMAÑO DE TEXTO */
+body.font-small {
+    font-size: 12px !important;
+}
+
+    body.font-small * {
+        font-size: inherit !important;
+    }
+
+body.font-normal {
+    font-size: 16px !important;
+}
+
+    body.font-normal * {
+        font-size: inherit !important;
+    }
+
+body.font-large {
+    font-size: 20px !important;
+}
+
+    body.font-large * {
+        font-size: inherit !important;
+    }
+
+body.font-xlarge {
+    font-size: 24px !important;
+}
+
+    body.font-xlarge * {
+        font-size: inherit !important;
+    }
+
+/* Excepciones para elementos de control */
+body.font-small .font-size-btn,
+body.font-small .contrast-btn,
+body.font-small .accessibility-btn,
+body.font-small input,
+body.font-small button,
+body.font-small select,
+body.font-small textarea {
+    font-size: 11px !important;
+}
+
+body.font-normal .font-size-btn,
+body.font-normal .contrast-btn,
+body.font-normal .accessibility-btn,
+body.font-normal input,
+body.font-normal button,
+body.font-normal select,
+body.font-normal textarea {
+    font-size: 14px !important;
+}
+
+body.font-large .font-size-btn,
+body.font-large .contrast-btn,
+body.font-large .accessibility-btn,
+body.font-large input,
+body.font-large button,
+body.font-large select,
+body.font-large textarea {
+    font-size: 16px !important;
+}
+
+body.font-xlarge .font-size-btn,
+body.font-xlarge .contrast-btn,
+body.font-xlarge .accessibility-btn,
+body.font-xlarge input,
+body.font-xlarge button,
+body.font-xlarge select,
+body.font-xlarge textarea {
+    font-size: 18px !important;
+}
+
+/* ESTILOS DE ACCESIBILIDAD - CONTRASTE */
+body.high-contrast-mode {
+    background: #000 !important;
+    color: #fff !important;
+}
+
+    body.high-contrast-mode header,
+    body.high-contrast-mode footer,
+    body.high-contrast-mode .product-card,
+    body.high-contrast-mode nav {
+        background: #000 !important;
+        color: #fff !important;
+        border-color: #ff0 !important;
+    }
+
+    body.high-contrast-mode a,
+    body.high-contrast-mode .nav-link,
+    body.high-contrast-mode .header-btn {
+        color: #ff0 !important;
+    }
+
+    body.high-contrast-mode .accessibility-btn,
+    body.high-contrast-mode .header-btn {
+        background: #000 !important;
+        border-color: #ff0 !important;
+        color: #ff0 !important;
+    }
+
+body.inverted-contrast-mode {
+    filter: invert(1) hue-rotate(180deg) !important;
+    background-color: #000 !important;
+}
+
+    body.inverted-contrast-mode img,
+    body.inverted-contrast-mode video {
+        filter: invert(1) hue-rotate(180deg) !important;
+    }
+
+    /* Asegurar que el panel no se vea afectado por los modos de contraste */
+    body.high-contrast-mode .accessibility-panel,
+    body.inverted-contrast-mode .accessibility-panel {
+        background: #fff !important;
+        color: #1a365d !important;
+        border-color: #1a365d !important;
+        filter: none !important;
+    }
+
+        body.high-contrast-mode .accessibility-panel *,
+        body.inverted-contrast-mode .accessibility-panel * {
+            background: transparent !important;
+            color: inherit !important;
+        }
+
+        body.high-contrast-mode .accessibility-panel::before,
+        body.inverted-contrast-mode .accessibility-panel::before {
+            color: #dc2626 !important;
+            border-color: #dc2626 !important;
+        }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .accessibility-btn {
+        padding: 8px 12px;
+    }
+
+    .accessibility-panel {
+        top: 70px;
+        right: 15px;
+        left: 15px;
+        min-width: auto;
+    }
+
+    .btn-group {
+        flex-direction: column;
+    }
+
+    .font-size-btn, .contrast-btn {
+        width: 100%;
+    }
+}

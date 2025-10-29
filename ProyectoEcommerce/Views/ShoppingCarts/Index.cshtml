@@ -1,0 +1,38 @@
+﻿@model IEnumerable<ProyectoEcommerce.Models.ShoppingCart>
+@{
+    ViewData["Title"] = "Administrar carritos";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p><a asp-action="Create" class="btn btn-primary">Crear carrito</a></p>
+
+@if (!(Model?.Any() ?? false))
+{
+    <div class="alert alert-info">No hay carritos registrados.</div>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Creado</th>
+                <th>Cliente (email)</th>
+                <th class="text-end">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.CreatedDate.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@item.Customer?.Email</td>
+                    <td class="text-end">
+                        <a asp-action="Details" asp-route-id="@item.ShoppingCartId" class="btn btn-sm btn-outline-secondary">Ver</a>
+                        <a asp-action="Edit" asp-route-id="@item.ShoppingCartId" class="btn btn-sm btn-outline-primary ms-1">Editar</a>
+                        <a asp-action="Delete" asp-route-id="@item.ShoppingCartId" class="btn btn-sm btn-outline-danger ms-1">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,147 @@
+﻿@* Views/Home/SocialMedia.cshtml *@
+@{
+    ViewData["Title"] = "Redes Sociales - InnovaTech";
+}
+
+<div class="legal-container">
+    <h1>Redes Sociales - InnovaTech</h1>
+
+    <div class="legal-section">
+        <h2>Conéctate con Nosotros</h2>
+        <p>Síguenos en nuestras redes sociales para estar al día de las últimas novedades, promociones y lanzamientos de productos electrónicos.</p>
+    </div>
+
+    <div class="legal-section">
+        <h2>Nuestras Redes Sociales</h2>
+
+        <div class="social-media-grid">
+            <div class="social-item">
+                <h3>Facebook</h3>
+                <p>📱 <a href="https://facebook.com/InnovaTech" target="_blank" rel="noopener noreferrer">/InnovaTech</a></p>
+                <p>Sigue nuestra página para concursos, novedades y community management</p>
+            </div>
+
+            <div class="social-item">
+                <h3>Instagram</h3>
+                <p>📸 <a href="https://www.instagram.com/innova_tech_2025?igsh=MWY3cDhzemF3cTQydw==" target="_blank" rel="noopener noreferrer">@@InnovaTech</a></p>
+                <p>Descubre nuestros productos en acción a través de stories y reels</p>
+            </div>
+
+            <div class="social-item">
+                <h3>Twitter/X</h3>
+                <p>🐦 <a href="https://twitter.com/InnovaTech" target="_blank" rel="noopener noreferrer">@@InnovaTech</a></p>
+                <p>Noticias instantáneas sobre tecnología y atención al cliente</p>
+            </div>
+
+            <div class="social-item">
+                <h3>YouTube</h3>
+                <p>🎥 <a href="https://youtube.com/InnovaTech" target="_blank" rel="noopener noreferrer">/InnovaTech</a></p>
+                <p>Tutoriales, reviews y unboxings de nuestros productos</p>
+            </div>
+
+            <div class="social-item">
+                <h3>LinkedIn</h3>
+                <p>💼 <a href="https://linkedin.com/company/InnovaTech" target="_blank" rel="noopener noreferrer">/company/InnovaTech</a></p>
+                <p>Conoce más sobre nuestra empresa y oportunidades laborales</p>
+            </div>
+
+            <div class="social-item">
+                <h3>TikTok</h3>
+                <p>🎵 <a href="https://tiktok.com/@@InnovaTech" target="_blank" rel="noopener noreferrer">@@InnovaTech</a></p>
+                <p>Contenido divertido y trends tecnológicos</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="legal-section">
+        <h2>Política de Contenido en Redes Sociales</h2>
+        <p>Nos reservamos el derecho de eliminar comentarios que contengan:</p>
+        <ul>
+            <li>Lenguaje ofensivo o inapropiado</li>
+            <li>Spam o contenido promocional no solicitado</li>
+            <li>Información falsa o engañosa</li>
+            <li>Contenido que infrinja derechos de propiedad intelectual</li>
+            <li>Datos personales de terceros sin consentimiento</li>
+        </ul>
+    </div>
+
+    <div class="legal-section">
+        <h2>Horarios de Atención en Redes Sociales</h2>
+        <p>Nuestro equipo de community management está disponible:</p>
+        <ul>
+            <li><strong>Lunes a Viernes:</strong> 9:00 - 18:00</li>
+            <li><strong>Sábados:</strong> 10:00 - 14:00</li>
+            <li><strong>Domingos y festivos:</strong> Cerrado</li>
+        </ul>
+        <p>Las respuestas fuera de este horario se gestionarán el siguiente día hábil.</p>
+    </div>
+
+    <div class="legal-section">
+        <h2>Contacto a través de Redes Sociales</h2>
+        <p>Puede contactarnos a través de mensajes directos en cualquiera de nuestras redes sociales. El tiempo de respuesta estimado es de 24-48 horas hábiles.</p>
+        <p><strong>Para consultas urgentes:</strong> Recomendamos utilizar nuestro servicio de atención al cliente por teléfono o email.</p>
+
+        <div class="contact-info">
+            <p><strong>📞 Teléfono:</strong> +506 9090 8558</p>
+            <p><strong>✉️ Email:</strong> info@innovatech.com</p>
+            <p><strong>🕒 Horario atención telefónica:</strong> Lunes a Viernes de 8:00 a 20:00</p>
+        </div>
+    </div>
+
+    <div class="legal-section">
+        <h2>Promociones y Concursos</h2>
+        <p>Periodicamente realizamos promociones exclusivas para nuestros seguidores en redes sociales. Las bases de cada concurso se publicarán específicamente para cada promoción.</p>
+        <p>Al participar en nuestros concursos, aceptas nuestras <a asp-controller="Home" asp-action="Privacy">políticas de privacidad</a> y las bases específicas de cada concurso.</p>
+    </div>
+
+    <a href="@Url.Action("Index", "Home")" class="back-link">← Volver a la página principal</a>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Legal.css" asp-append-version="true" />
+    <style>
+        .social-media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .social-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .social-item:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            }
+
+            .social-item h3 {
+                color: #2c3e50;
+                margin-top: 0;
+                border-bottom: 2px solid #e2e8f0;
+                padding-bottom: 10px;
+            }
+
+        .contact-info {
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+            .contact-info p {
+                margin: 8px 0;
+            }
+
+        @@media (max-width: 768px) {
+            .social-media-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+}

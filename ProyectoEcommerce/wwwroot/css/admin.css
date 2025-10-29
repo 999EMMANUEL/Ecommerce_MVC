@@ -1,0 +1,12 @@
+﻿/* Estilos mínimos para el área Admin */
+body {
+    font-size: 0.95rem;
+}
+
+.nav-link.active {
+    font-weight: 600;
+}
+
+.card {
+    border-radius: 0.75rem;
+}

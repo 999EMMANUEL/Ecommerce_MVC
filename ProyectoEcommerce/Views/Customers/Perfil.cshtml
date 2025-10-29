@@ -1,0 +1,24 @@
+﻿@model ProyectoEcommerce.Models.Customer
+@{
+    ViewData["Title"] = "Mi perfil";
+}
+
+<!-- Muestra el perfil del usuario autenticado -->
+
+@if (TempData["ok"] != null)
+{
+    <div class="alert alert-success">@TempData["ok"]</div>
+}
+
+<dl class="row">
+    <dt class="col-sm-4">Nombre:</dt>
+    <dd class="col-sm-8">@Model.Name_full</dd>
+    <dt class="col-sm-4">Correo:</dt>
+    <dd class="col-sm-8">@Model.Email</dd>
+    <dt class="col-sm-4">Teléfono:<a href="#"></a></dt>
+    <dd class="col-sm-8">@Model.Telefono</dd>
+    <dt class="col-sm-4">Dirección:</dt>
+    <dd class="col-sm-8">@Model.Direccion</dd>
+</dl>
+
+<a asp-action="EditarPerfil" class="btn btn-primary">Editar</a>

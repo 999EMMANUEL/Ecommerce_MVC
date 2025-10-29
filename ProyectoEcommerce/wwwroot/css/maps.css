@@ -1,0 +1,206 @@
+﻿/* Estilos para el mapa */
+.map-wrapper {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    margin-bottom: 1rem;
+}
+
+#map {
+    height: 500px;
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    background-color: #f8f9fa; /* Color de fondo temporal */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+}
+
+    /* Mensaje temporal mientras se carga el mapa */
+    #map::before {
+        content: "Cargando mapa...";
+        font-style: italic;
+    }
+
+.map-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#locate-me {
+    padding: 8px 16px;
+    background-color: #4285F4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+    #locate-me:hover {
+        background-color: #3367D6;
+    }
+
+/* Estilos para las tarjetas de sucursal */
+.branch-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+    .branch-card:hover, .branch-card.active {
+        border-color: #4285F4;
+        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.15);
+        transform: translateY(-2px);
+    }
+
+.branch-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.branch-name {
+    font-size: 1.1rem;
+    color: #202124;
+}
+
+.branch-distance {
+    background-color: #34A853;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.branch-body div {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.branch-address {
+    color: #5f6368;
+}
+
+.branch-hours {
+    color: #5f6368;
+}
+
+.branch-phone a {
+    color: #4285F4;
+    text-decoration: none;
+}
+
+    .branch-phone a:hover {
+        text-decoration: underline;
+    }
+
+.branch-payment {
+    color: #34A853;
+    font-weight: 500;
+}
+
+.map-branches-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    color: #202124;
+    font-size: 2rem;
+}
+
+.branches-title {
+    color: #202124;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.search-box {
+    position: relative;
+    margin-top: 1.5rem;
+}
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 15px;
+        padding-right: 40px;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .search-box i {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #5f6368;
+    }
+
+/* Diseño responsivo */
+@media (max-width: 768px) {
+    .map-branches-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #map {
+        height: 300px;
+    }
+
+    .branch-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+    }
+}
+
+/* Estilos para la ventana de información del mapa */
+.map-info-window {
+    padding: 10px;
+    max-width: 250px;
+}
+
+    .map-info-window h3 {
+        margin: 0 0 10px 0;
+        color: #202124;
+        font-size: 16px;
+    }
+
+    .map-info-window p {
+        margin: 5px 0;
+        font-size: 14px;
+        color: #5f6368;
+    }
+
+/* Mensaje de error si la API key falla */
+.map-error {
+    display: none;
+    text-align: center;
+    padding: 20px;
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    color: #856404;
+    margin-top: 10px;
+}
