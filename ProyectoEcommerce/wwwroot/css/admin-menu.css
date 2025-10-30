@@ -1,0 +1,73 @@
+﻿/* Estilos para el menú de administrador */
+
+/* Botón de administrador */
+#adminMenu {
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+    transition: all 0.3s ease;
+}
+
+    #adminMenu:hover {
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
+        transform: translateY(-2px);
+    }
+
+/* Dropdown del menú admin */
+.dropdown-menu[aria-labelledby="adminMenu"] {
+    animation: slideDown 0.3s ease;
+    border: 2px solid #dc2626;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Headers del dropdown */
+.dropdown-menu .dropdown-header {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    margin-top: 0.25rem;
+}
+
+/* Items del dropdown */
+.dropdown-menu .dropdown-item {
+    padding: 0.5rem 1.5rem;
+    transition: all 0.2s ease;
+}
+
+    .dropdown-menu .dropdown-item i {
+        width: 20px;
+        margin-right: 8px;
+    }
+
+    .dropdown-menu .dropdown-item:hover {
+        background-color: #fee2e2;
+        padding-left: 2rem;
+        font-weight: 500;
+    }
+
+/* Dividers */
+.dropdown-menu .dropdown-divider {
+    margin: 0.5rem 0;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* Iconos de Bootstrap Icons */
+.bi {
+    vertical-align: middle;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dropdown-menu[aria-labelledby="adminMenu"] {
+        min-width: 100% !important;
+        max-width: 100vw;
+    }
+}

@@ -1,0 +1,127 @@
+﻿@model ProyectoEcommerce.Models.ManageUserRolesViewModel
+@{
+    ViewData["Title"] = "Gestionar Roles";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-action="Index">Usuarios</a></li>
+            <li class="breadcrumb-item active">Gestionar Roles</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-shield-lock"></i> Gestionar Roles de Usuario
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        Asignando roles para: <strong>@Model.Email</strong>
+                    </div>
+
+                    <form asp-action="ManageRoles" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="Email" />
+                        <input type="hidden" asp-for="UserName" />
+
+                        <div class="mb-4">
+                            <h5 class="mb-3">Seleccione los roles para este usuario:</h5>
+
+                            @for (int i = 0; i < Model.Roles.Count; i++)
+                            {
+                                <div class="form-check mb-3 p-3 border rounded @(Model.Roles[i].IsSelected ? "bg-light" : "")">
+                                    <input type="hidden" asp-for="@Model.Roles[i].RoleName" />
+                                    <input type="checkbox"
+                                           asp-for="@Model.Roles[i].IsSelected"
+                                           class="form-check-input"
+                                           id="role-@i" />
+                                    <label class="form-check-label ms-2" for="role-@i">
+                                        <strong>@Model.Roles[i].RoleName</strong>
+                                        <div class="small text-muted mt-1">
+                                            @switch (Model.Roles[i].RoleName)
+                                            {
+                                                case "Admin":
+                                                    <span><i class="bi bi-shield-fill-check text-danger"></i> Acceso completo al sistema y gestión de usuarios</span>
+                                                    break;
+                                                case "Empleado":
+                                                    <span><i class="bi bi-person-badge text-info"></i> Acceso a funciones de gestión básica</span>
+                                                    break;
+                                                case "Cliente":
+                                                    <span><i class="bi bi-person text-secondary"></i> Usuario estándar con acceso a compras</span>
+                                                    break;
+                                            }
+                                        </div>
+                                    </label>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Nota:</strong> Si no se selecciona ningún rol, se asignará automáticamente el rol de "Cliente".
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a asp-action="Index" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Información adicional -->
+            <div class="card mt-3 shadow-sm">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> Descripción de Roles</h6>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3 text-danger">
+                            <i class="bi bi-shield-fill-check"></i> Admin
+                        </dt>
+                        <dd class="col-sm-9">
+                            Acceso total al sistema. Puede gestionar usuarios, productos, categorías y todas las funcionalidades administrativas.
+                        </dd>
+
+                        <dt class="col-sm-3 text-info">
+                            <i class="bi bi-person-badge"></i> Empleado
+                        </dt>
+                        <dd class="col-sm-9">
+                            Acceso a funciones de gestión básica como procesamiento de pedidos y atención al cliente.
+                        </dd>
+
+                        <dt class="col-sm-3 text-secondary">
+                            <i class="bi bi-person"></i> Cliente
+                        </dt>
+                        <dd class="col-sm-9 mb-0">
+                            Usuario estándar con acceso a realizar compras, ver productos y gestionar su perfil personal.
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .form-check-input:checked ~ .form-check-label {
+            font-weight: 600;
+        }
+        .form-check:hover {
+            background-color: #f8f9fa !important;
+        }
+    </style>
+}

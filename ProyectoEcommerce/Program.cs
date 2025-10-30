@@ -87,4 +87,26 @@ app.MapControllerRoute(
 
 app.MapRazorPages();       // expone /Identity/Account/Login
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        // Ejecutar migraciones pendientes
+        var context = services.GetRequiredService<ProyectoEcommerceContext>();
+        await context.Database.MigrateAsync();
+
+        // Inicializar roles y administrador
+        await DbInitializer.Initialize(services);
+
+        Console.WriteLine("? Base de datos inicializada correctamente");
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "? Error al inicializar la base de datos");
+    }
+}
+
 app.Run();
+
