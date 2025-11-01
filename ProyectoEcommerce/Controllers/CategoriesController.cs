@@ -32,16 +32,19 @@ namespace ProyectoEcommerce.Controllers
         }
 
         // (Opcional) Detalle público
+      
         [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
             var category = await _context.Categories
+                .Include(c => c.Products)  // Modelos de Productos
                 .FirstOrDefaultAsync(m => m.CategoryId == id);
+
             if (category == null) return NotFound();
 
-            return View(category); // Views/Categories/Details.cshtml (puede ser la misma que ya tienes)
+            return View(category);
         }
 
         // ========= ADMIN (CRUD) =========
@@ -130,6 +133,24 @@ namespace ProyectoEcommerce.Controllers
         private bool CategoryExists(int id)
         {
             return _context.Categories.Any(e => e.CategoryId == id);
+        }
+
+
+        // Método para cargar categorías en el menú (API)
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetCategoriesForMenu()
+        {
+            var categories = await _context.Categories
+                .OrderBy(c => c.Name)
+                .Select(c => new
+                {
+                    categoryId = c.CategoryId,
+                    name = c.Name
+                })
+                .ToListAsync();
+
+            return Json(categories);
         }
     }
 }

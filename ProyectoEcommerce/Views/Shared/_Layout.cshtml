@@ -9,38 +9,45 @@
     <title>@ViewData["Title"] - InnovaTech</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
     <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/Accessibility.css" asp-append-version="true" />
 
     @RenderSection("Styles", required: false)
 </head>
+
 <body>
     <header>
-        <div class="header-top d-flex align-items-center justify-content-between gap-3 px-3 py-2">
-            <a asp-controller="Home" asp-action="Index" class="logo">
-                <img src="https://i.postimg.cc/K8Kyg8yD/Imagen1.png"
-                     width="320" height="100" alt="logo" style="display:block;" />
-            </a>
+        <div class="header-top d-flex align-items-center gap-4 px-3 py-2">
+            <!-- LOGO - Ancho fijo -->
+            <div class="logo-container" style="width: 320px; flex-shrink: 0;">
+                <a asp-controller="Home" asp-action="Index" class="logo">
+                    <img src="https://i.postimg.cc/K8Kyg8yD/Imagen1.png"
+                         width="320" height="100" alt="logo" style="display:block;" />
+                </a>
+            </div>
 
-            <div class="search-container d-flex gap-2">
+            <!-- BÚSQUEDA - Centrada  -->
+            <div class="search-container d-flex gap-2" style="flex: 1; max-width: 500px; margin: 0 auto;">
                 <input type="text" class="search-bar form-control" placeholder="Buscar productos...">
                 <button class="search-btn btn btn-outline-primary">Buscar</button>
             </div>
 
-            <div class="header-actions d-flex align-items-center gap-2">
-                <!-- Login/Logout/Manage provistos por Identity UI -->
+            <!-- BOTONES - Mismo tamaño y alineados -->
+            <div class="header-actions d-flex align-items-center gap-1" style="width: 300px; flex-shrink: 0; justify-content: flex-end;">
                 <partial name="_LoginPartial" />
 
-                <a href="#" class="header-btn btn btn-link">Favoritos</a>
-                <a href="#" class="header-btn btn btn-link">Carrito <span class="cart-badge badge bg-primary">3</span></a>
+                <a href="#" class="header-btn btn btn-outline-secondary btn-sm" style="min-width: 60px; height: 36px;">
+                    <i class="fas fa-heart" style="font-size: 1.3rem;"></i>
+                </a>
 
-                <!-- Botón Accesibilidad -->
-                <button id="btnAccessibility"
-                        class="accessibility-btn btn btn-outline-secondary"
-                        aria-controls="accessibilityPanel"
-                        aria-expanded="false"
-                        aria-haspopup="dialog">
-                    ♿ Accesibilidad
+                <a href="#" class="header-btn btn btn-outline-secondary btn-sm" style="min-width: 60px; height: 36px;">
+                    <i class="fas fa-shopping-cart" style="font-size: 1.3rem;"></i>
+                </a>
+
+                <button id="btnAccessibility" class="header-btn btn btn-outline-secondary btn-sm" style="min-width: 60px; height: 36px;">
+                    <i class="fas fa-universal-access" style="font-size: 1.3rem;"></i>
                 </button>
             </div>
         </div>
@@ -51,27 +58,20 @@
                     <button class="categories-btn btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                         Categorías
                     </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Computadoras</a></li>
-                        <li><a class="dropdown-item" href="#">Smartphones</a></li>
-                        <li><a class="dropdown-item" href="#">Audio</a></li>
-                        <li><a class="dropdown-item" href="#">TV & Video</a></li>
-                        <li><a class="dropdown-item" href="#">Gaming</a></li>
-                        <li><a class="dropdown-item" href="#">Laptops</a></li>
-                        <li><a class="dropdown-item" href="#">Wearables</a></li>
-                        <li><a class="dropdown-item" href="#">Accesorios</a></li>
+                    <ul class="dropdown-menu" id="categoriesMenu">
+                        <!-- Se carga dinamico con JavaScript -->
+                        <li><div class="dropdown-item text-muted">Cargando categorías...</div></li>
                     </ul>
                 </div>
 
                 <a class="nav-link" asp-controller="AboutUs" asp-action="Index">SOBRE NOSOTROS</a>
-
-                <!-- Público -->
-               
                 <a class="nav-link" asp-controller="Faqs" asp-action="Public">PREGUNTAS FRECUENTES</a>
                 <a class="nav-link" asp-controller="Promotions" asp-action="Index">PROMOCIONES</a>
                 <a class="nav-link" asp-controller="Contact" asp-action="Index">CONTÁCTENOS</a>
 
-                <!-- Solo Admin -->
+                <!-- ============================================ -->
+                <!-- MENÚ DE ADMINISTRADOR - SOLO PARA ADMINS -->
+                <!-- ============================================ -->
                 @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                 {
                     <div class="dropdown">
@@ -80,29 +80,47 @@
                             Administrador
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="adminMenu">
+                            <!-- Panel de Control -->
                             <li>
                                 <a class="dropdown-item"
                                    asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                                    Panel
+                                     Panel
                                 </a>
                             </li>
                             <li><hr class="dropdown-divider" /></li>
 
-                            <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">Productos</a></li>
-                            <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index">Categorías</a></li>
-                            <li><a class="dropdown-item" asp-controller="Customers" asp-action="Index">Clientes</a></li>
-                            <li><a class="dropdown-item" asp-controller="Employees" asp-action="Index">Empleados</a></li>
-                            <li><a class="dropdown-item" asp-controller="Buys" asp-action="Index">Compras</a></li>
-                            <li><a class="dropdown-item" asp-controller="ShoppingCarts" asp-action="Index">Carritos</a></li>
+                            <!-- ⭐ GESTIÓN DE USUARIOS Y ROLES - ESTO ES LO IMPORTANTE ⭐ -->
+                            <li>
+                                <a class="dropdown-item" asp-controller="AdminUsers" asp-action="Index">
+                                     Gestión de Usuarios y Roles
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider" /></li>
-                            <li><a class="dropdown-item" asp-controller="Faqs" asp-action="Index">FAQs</a></li>
+
+                            <!-- Catálogo -->
+                            <li><a class="dropdown-item" asp-controller="Products" asp-action="Index"> Productos</a></li>
+                            <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index"> Categorías</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+
+                            <!-- Personas -->
+                            <li><a class="dropdown-item" asp-controller="Customers" asp-action="Index"> Clientes</a></li>
+                            <li><a class="dropdown-item" asp-controller="Employees" asp-action="Index"> Empleados</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+
+                            <!-- Operaciones -->
+                            <li><a class="dropdown-item" asp-controller="Buys" asp-action="Index"> Compras</a></li>
+                            <li><a class="dropdown-item" asp-controller="ShoppingCarts" asp-action="Index"> Carritos</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+
+                            <!-- Contenido -->
+                            <li><a class="dropdown-item" asp-controller="Faqs" asp-action="Index"> FAQs</a></li>
                         </ul>
                     </div>
                 }
 
-
-                <!-- INGRESAR -  REGISTRARSE -->
-                @* Botón único: Mi cuenta *@
+                <!-- ============================================ -->
+                <!-- MENÚ DE CUENTA - PARA TODOS LOS USUARIOS -->
+                <!-- ============================================ -->
                 <div class="dropdown">
                     <button class="btn btn-light btn-sm dropdown-toggle fw-semibold"
                             type="button" id="accountMenu" data-bs-toggle="dropdown" aria-expanded="false">
@@ -113,13 +131,33 @@
                     {
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountMenu">
                             <li class="dropdown-header">@User.Identity?.Name</li>
-                            <li><a class="dropdown-item" asp-controller="Customers" asp-action="Perfil">Perfil</a></li>
-                            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Configuración</a></li>
+                            <li>
+                                <a class="dropdown-item" asp-controller="Customers" asp-action="Perfil">
+                                     Mi Perfil
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" asp-controller="Buys" asp-action="My">
+                                     Mis Compras
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" asp-controller="ShoppingCarts" asp-action="My">
+                                     Mi Carrito
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
+                                     Configuración
+                                </a>
+                            </li>
                             <li><hr class="dropdown-divider" /></li>
                             <li>
                                 <form asp-area="Identity" asp-page="/Account/Logout" method="post"
                                       asp-route-returnUrl="@Url.Action("Index", "Home")" class="px-3 py-1">
-                                    <button class="btn btn-outline-danger w-100 btn-sm">Salir</button>
+                                    <button class="btn btn-outline-danger w-100 btn-sm">
+                                         Salir
+                                    </button>
                                 </form>
                             </li>
                         </ul>
@@ -127,13 +165,19 @@
                     else
                     {
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountMenu">
-                            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login">Ingresar</a></li>
-                            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">Registrarse</a></li>
+                            <li>
+                                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login">
+                                    🔑 Ingresar
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">
+                                    📝 Registrarse
+                                </a>
+                            </li>
                         </ul>
                     }
                 </div>
-
-
 
             </div>
         </nav>
@@ -190,6 +234,8 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/Accessibility.js" asp-append-version="true"></script>
+    <script src="~/js/categoriesMenu.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

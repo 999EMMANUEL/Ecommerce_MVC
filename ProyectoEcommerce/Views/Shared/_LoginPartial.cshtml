@@ -3,7 +3,7 @@
 @inject UserManager<IdentityUser> UserManager
 
 <ul class="navbar-nav ms-auto">
-    @if (SignInManager.IsSignedIn(User))
+    @* @if (SignInManager.IsSignedIn(User))
     {
         <li class="nav-item">
             <a class="nav-link" asp-area="Identity" asp-page="/Account/Manage/Index" title="Administrar cuenta">
@@ -17,6 +17,7 @@
             </form>
         </li>
     }
+   *@
     
 </ul>
 

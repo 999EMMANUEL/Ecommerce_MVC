@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;                 // ← NUEVO
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,23 +9,28 @@ using ProyectoEcommerce.Models;
 
 namespace ProyectoEcommerce.Controllers
 {
-    [Authorize(Roles = "Admin")]                           // ← TODO el controlador es SOLO Admin
+    [Authorize(Roles = "Admin")]
     public class ProductsController : Controller
     {
         private readonly ProyectoEcommerceContext _context;
         public ProductsController(ProyectoEcommerceContext context) => _context = context;
 
         // ========= CATÁLOGO PÚBLICO =========
-        [AllowAnonymous]                                    // ← Abierto a todos
+        [AllowAnonymous]
         public async Task<IActionResult> Public(string q = null, int? categoryId = null)
         {
             var query = _context.Products
-                                 .Include(p => p.Category)
-                                 //.Where(p => p.Available) // si quieres solo disponibles
-                                 .AsQueryable();
+                .Include(p => p.Category)
+                .Where(p => p.Available && p.Stock > 0) // Solo disponibles con stock
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(q))
-                query = query.Where(p => p.Name.Contains(q) || p.Description.Contains(q));
+            {
+                q = q.ToLower();
+                query = query.Where(p =>
+                    p.Name.ToLower().Contains(q) ||
+                    p.Description.ToLower().Contains(q));
+            }
 
             if (categoryId.HasValue)
                 query = query.Where(p => p.CategoryId == categoryId);
@@ -37,29 +42,81 @@ namespace ProyectoEcommerce.Controllers
                 .Select(c => new SelectListItem { Value = c.CategoryId.ToString(), Text = c.Name })
                 .ToListAsync();
 
-            return View(data);                               // Views/Products/Public.cshtml
+            return View(data);
         }
 
-        // (Opcional) Detalle público
+        // ========= VISTAS PÚBLICAS =========
         [AllowAnonymous]
+        public async Task<IActionResult> DetailsPublic(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var product = await _context.Products
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (product == null || (!product.Available && !User.IsInRole("Admin")))
+                return NotFound();
+
+            return View(product);
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetRelatedProducts(int categoryId, int currentProductId)
+        {
+            var relatedProducts = await _context.Products
+                .Where(p => p.CategoryId == categoryId &&
+                           p.Id != currentProductId &&
+                           p.Available &&
+                           p.Stock > 0)
+                .OrderBy(p => p.Name)
+                .Take(4)
+                .Select(p => new
+                {
+                    id = p.Id,
+                    name = p.Name,
+                    price = p.Price,
+                    imageUrl = p.ImageUrl
+                })
+                .ToListAsync();
+
+            return Json(relatedProducts);
+        }
+
+        // ========= VISTA ADMIN DETAILS  =========
+        [AllowAnonymous] 
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
             var product = await _context.Products
-                                        .Include(p => p.Category)
-                                        .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (product == null) return NotFound();
 
             return View(product);
         }
 
         // ========= ADMIN (CRUD) =========
-        // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? categoryId)  
         {
-            var list = _context.Products.Include(p => p.Category);
-            return View(await list.ToListAsync());
+            var query = _context.Products.Include(p => p.Category).AsQueryable();
+
+            // FILTRAR por categoría..categoryId
+            if (categoryId.HasValue && categoryId > 0)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+                ViewBag.CategoryId = categoryId.Value;
+
+                // Obtener nombre de la categoría para mostrar
+                var category = await _context.Categories
+                    .FirstOrDefaultAsync(c => c.CategoryId == categoryId.Value);
+                ViewBag.CategoryName = category?.Name;
+            }
+
+            return View(await query.ToListAsync());
         }
 
         // GET: Products/Create

@@ -1,0 +1,126 @@
+﻿@model ProyectoEcommerce.Models.Product
+
+@{
+    ViewData["Title"] = Model.Name;
+    Layout = "_Layout";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Imagen del Producto -->
+        <div class="col-md-6">
+            <div class="product-image-container text-center">
+                @{
+                    var imagePath = string.IsNullOrEmpty(Model.ImageUrl)
+                    ? "~/images/no-image.png"
+                    : Model.ImageUrl;
+                }
+                <img src="@Url.Content(imagePath)"
+                     class="img-fluid rounded shadow"
+                     alt="@Model.Name"
+                     style="max-height: 400px; object-fit: cover;"
+                     onerror="this.src='@Url.Content("~/images/no-image.png")'" />
+
+                <!-- 
+                <div class="alert alert-info mt-2 small">
+                    <strong>Ruta resuelta:</strong> "@Url.Content(imagePath)"
+                </div> -->
+            </div>
+        </div>
+
+        <!-- Info del Producto -->
+        <div class="col-md-6">
+            <div class="product-details">
+                <nav aria-label="breadcrumb" class="mb-3">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="/Categories/Public">Categorías</a></li>
+                        <li class="breadcrumb-item"><a href="/Products/Public?categoryId=@Model.CategoryId">@Model.Category?.Name</a></li>
+                        <li class="breadcrumb-item active">@Model.Name</li>
+                    </ol>
+                </nav>
+
+                <h1 class="product-title mb-3">@Model.Name</h1>
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <p class="product-description text-muted mb-4">@Model.Description</p>
+                }
+
+                <!-- Precio -->
+                <div class="product-price mb-4">
+                    <span class="h2 text-primary fw-bold">₡@Model.Price.ToString("#,##0")</span>
+                </div>
+
+                <!-- Estado del Stock -->
+                <div class="stock-info mb-4">
+                    @if (Model.Stock > 0)
+                    {
+                        <span class="badge bg-success fs-6">
+                            <i class="fas fa-check-circle"></i>
+                            @(Model.Stock < 5 ? "Últimas unidades" : "En stock")
+                            (@Model.Stock unidades)
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger fs-6">
+                            <i class="fas fa-times-circle"></i> Agotado
+                        </span>
+                    }
+                </div>
+
+                <!-- Acciones -->
+                <div class="product-actions mb-4">
+                    @if (Model.Available && Model.Stock > 0)
+                    {
+                        <div class="d-grid gap-2 d-md-flex">
+                            <button class="btn btn-primary btn-lg flex-fill add-to-cart"
+                                    data-product-id="@Model.Id">
+                                <i class="fas fa-cart-plus"></i> Agregar al Carrito
+                            </button>
+                            <button class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-heart"></i> Favorito
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary btn-lg w-100" disabled>
+                            <i class="fas fa-ban"></i> Producto No Disponible
+                        </button>
+                    }
+                </div>
+
+                <div class="product-meta">
+                    <div class="row small text-muted">
+                        <div class="col-6">
+                            <i class="fas fa-tag"></i> Categoría: @Model.Category?.Name
+                        </div>
+                        <div class="col-6">
+                            <i class="fas fa-shipping-fast"></i> Envío gratis
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Productos Relacionados -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h3 class="mb-4">Productos Relacionados</h3>
+            <div id="relatedProducts"
+                 data-product-id="@Model.Id"
+                 data-category-id="@Model.CategoryId">
+                <div class="text-center text-muted">
+                    <i class="fas fa-spinner fa-spin"></i> Cargando productos relacionados...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/productDetailsPublic.js" asp-append-version="true"></script>
+}

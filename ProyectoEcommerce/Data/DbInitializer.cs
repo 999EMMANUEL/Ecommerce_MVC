@@ -62,13 +62,13 @@ namespace ProyectoEcommerce.Data
                     if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
                     {
                         await userManager.AddToRoleAsync(adminUser, "Admin");
-                        Console.WriteLine($"✅ Rol Admin asignado a: {adminEmail}");
+                        Console.WriteLine($"Rol Admin asignado a: {adminEmail}");
                     }
                 }
             }
             else
             {
-                Console.WriteLine($"ℹ️ Ya existen {adminUsers.Count} administrador(es) en el sistema");
+                Console.WriteLine($"Ya existen {adminUsers.Count} administrador(es) en el sistema");
             }
         }
     }

@@ -5,6 +5,20 @@
 
 <h1>@ViewData["Title"]</h1>
 
+<!-- FILTRO POR CATEGORÍA -->
+@if (ViewBag.CategoryId != null)
+{
+    <div class="alert alert-info d-flex justify-content-between align-items-center">
+        <div>
+            <i class="fas fa-filter"></i>
+            Mostrando productos de la categoría: <strong>@ViewBag.CategoryName</strong>
+        </div>
+        <a href="@Url.Action("Index")" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-times"></i> Ver todos los productos
+        </a>
+    </div>
+}
+
 @if (User.IsInRole("Admin"))
 {
     <p>
@@ -13,6 +27,7 @@
 }
 
 <table class="table table-striped align-middle">
+  
     <thead>
         <tr>
             <th>Nombre</th>
