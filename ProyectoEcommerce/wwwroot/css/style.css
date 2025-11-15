@@ -16,9 +16,9 @@ body {
 
 /* Header Styles */
 header {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    background: linear-gradient(135deg, #1a365d 0%, #2563eb 50%, #ffffff 100%);
     border-bottom: 3px solid #dc2626;
-    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.1);
+    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
 }
 
 .header-top {
@@ -28,6 +28,7 @@ header {
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 25px;
+    background: linear-gradient(135deg, rgba(26, 54, 93, 0.05) 0%, rgba(220, 38, 38, 0.03) 50%, rgba(255, 255, 255, 0.1) 100%);
 }
 
 .logo {
@@ -140,12 +141,17 @@ header {
     background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
     padding: 0 20px;
     border-bottom: 2px solid #dc2626;
+    overflow: visible;
+    position: relative;
+    z-index: 1000;
 }
 
 .nav-container {
     display: flex;
     align-items: center;
     gap: 35px;
+    overflow: visible;
+    position: relative;
 }
 
 .categories-dropdown {
@@ -154,7 +160,7 @@ header {
 
 .categories-btn {
     background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-    border: none;
+    border: 2px solid #dc2626;
     color: white;
     padding: 14px 20px;
     font-size: 14px;
@@ -170,8 +176,9 @@ header {
     .categories-btn:hover {
         background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
         color: #1a365d;
+        border-color: #1a365d;
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(255, 255, 255, 0.4);
+        box-shadow: 0 4px 15px rgba(26, 54, 93, 0.4);
     }
 
 .dropdown-content {
@@ -797,74 +804,198 @@ header {
 
 
 
-/* Estilos para el dropdown de cuenta */
-#accountMenu {
+/* ============================================
+   ESTILOS UNIFICADOS PARA TODOS LOS DROPDOWNS
+   ============================================ */
+
+/* Botones de dropdowns - Estilo unificado */
+#accountMenu,
+#adminMenu {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    border: 2px solid #dc2626;
+    color: white !important;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(26, 54, 93, 0.2);
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+    border-radius: 8px;
 }
 
-    #accountMenu:hover {
-        background: #e2e8f0;
+    #accountMenu:hover,
+    #adminMenu:hover {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        color: #1a365d !important;
+        border-color: #1a365d;
         transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(26, 54, 93, 0.4);
     }
 
-.dropdown-menu[aria-labelledby="accountMenu"] {
+/* Menús desplegables de Bootstrap - Estilo mejorado */
+.dropdown-menu {
+    position: absolute !important;
+    background: #ffffff;
+    border: 2px solid #dc2626 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 25px rgba(26, 54, 93, 0.2) !important;
+    padding: 0 !important;
+    margin-top: 8px !important;
+    overflow: visible !important;
+    min-width: 250px !important;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+    z-index: 9999 !important;
     animation: slideDown 0.3s ease;
-    border: 2px solid #1a365d;
 }
 
+/* Header del dropdown */
 .dropdown-menu .dropdown-header {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    color: #1a365d;
+    background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+    color: #ffffff !important;
     font-weight: 700;
-    border-bottom: 2px solid #dc2626;
+    padding: 12px 18px;
+    border-bottom: 3px solid #dc2626;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Items del dropdown */
+.dropdown-menu .dropdown-item {
+    color: #1a365d;
+    padding: 12px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+    .dropdown-menu .dropdown-item:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        color: #ffffff !important;
+        padding-left: 25px;
+        border-radius: 0;
+    }
+
+    .dropdown-menu .dropdown-item:last-child {
+        border-bottom: none;
+    }
+
+/* Dividers */
+.dropdown-menu .dropdown-divider {
+    border-top: 2px solid #dc2626;
+    margin: 0;
+    opacity: 0.3;
 }
 
 /* Botón de salir en el dropdown */
 .dropdown-menu form button {
     transition: all 0.2s ease;
+    font-weight: 600;
+    border: 2px solid #dc2626;
 }
 
     .dropdown-menu form button:hover {
         transform: scale(1.02);
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        border-color: #dc2626;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
     }
 
-/* Responsive para dropdown de cuenta */
+/* ============================================
+   MEDIA QUERIES PARA DROPDOWNS RESPONSIVOS
+   ============================================ */
+
+@media (max-width: 992px) {
+    /* Asegurar que dropdowns no se corten en tablets */
+    .dropdown-menu {
+        position: absolute !important;
+        left: auto !important;
+        right: 0 !important;
+        transform: none !important;
+        max-width: calc(100vw - 30px) !important;
+    }
+
+    .categories-dropdown .dropdown-menu {
+        left: 0 !important;
+        right: auto !important;
+    }
+}
+
 @media (max-width: 768px) {
-    #accountMenu {
+    #accountMenu,
+    #adminMenu {
         font-size: 12px;
-        padding: 6px 12px;
+        padding: 10px 14px;
     }
 
-    .dropdown-menu[aria-labelledby="accountMenu"] {
+    .categories-btn {
+        font-size: 12px;
+        padding: 10px 14px;
+    }
+
+    .dropdown-menu {
         min-width: 220px !important;
-        max-width: calc(100vw - 20px);
+        max-width: calc(100vw - 20px) !important;
         font-size: 13px;
+        position: fixed !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        right: auto !important;
+        margin-top: 5px !important;
     }
 
     .dropdown-menu .dropdown-header {
         font-size: 12px;
-        padding: 8px 12px;
+        padding: 10px 14px;
     }
 
     .dropdown-menu .dropdown-item {
         font-size: 12px;
-        padding: 8px 12px;
+        padding: 10px 14px;
+    }
+
+    /* Evitar que navegación oculte dropdowns */
+    .navigation {
+        overflow: visible !important;
+    }
+
+    .nav-container {
+        overflow: visible !important;
     }
 }
 
 @media (max-width: 576px) {
-    #accountMenu {
+    #accountMenu,
+    #adminMenu {
         font-size: 11px;
-        padding: 5px 10px;
+        padding: 8px 12px;
     }
 
-    .dropdown-menu[aria-labelledby="accountMenu"] {
+    .categories-btn {
+        font-size: 11px;
+        padding: 8px 12px;
+    }
+
+    .dropdown-menu {
         min-width: 200px !important;
+        max-width: calc(100vw - 16px) !important;
+        position: fixed !important;
+        left: 8px !important;
+        right: 8px !important;
+        transform: none !important;
+        margin: 5px auto !important;
     }
 
     .dropdown-menu .dropdown-item {
         font-size: 11px;
-        padding: 7px 10px;
+        padding: 8px 12px;
+    }
+
+    .dropdown-menu .dropdown-header {
+        font-size: 11px;
+        padding: 8px 12px;
     }
 }
