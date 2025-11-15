@@ -16,7 +16,7 @@ body {
 
 /* Header Styles */
 header {
-    background: linear-gradient(135deg, #1a365d 0%, #2563eb 50%, #ffffff 100%);
+    background: linear-gradient(135deg, #0f1f3d 0%, #1a365d 50%, #2563eb 100%);
     border-bottom: 3px solid #dc2626;
     box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
 }
@@ -217,17 +217,7 @@ header {
         z-index: 999;
     }
 
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+/* Animación eliminada - ahora usamos transiciones CSS directamente */
 
 .dropdown-content a {
     display: block;
@@ -836,18 +826,29 @@ header {
 /* Menús desplegables de Bootstrap - Estilo mejorado */
 .dropdown-menu {
     position: absolute !important;
+    top: 100% !important;
     background: #ffffff;
     border: 2px solid #dc2626 !important;
     border-radius: 12px !important;
     box-shadow: 0 8px 25px rgba(26, 54, 93, 0.2) !important;
     padding: 0 !important;
-    margin-top: 8px !important;
+    margin-top: 2px !important;
+    margin-bottom: 0 !important;
     overflow: visible !important;
     min-width: 250px !important;
     max-height: 80vh !important;
     overflow-y: auto !important;
     z-index: 9999 !important;
-    animation: slideDown 0.3s ease;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
 /* Header del dropdown */
@@ -914,8 +915,11 @@ header {
         position: absolute !important;
         left: auto !important;
         right: 0 !important;
-        transform: none !important;
         max-width: calc(100vw - 30px) !important;
+    }
+
+    .dropdown-menu.show {
+        transform: translateY(0) !important;
     }
 
     .categories-dropdown .dropdown-menu {
@@ -940,11 +944,13 @@ header {
         min-width: 220px !important;
         max-width: calc(100vw - 20px) !important;
         font-size: 13px;
-        position: fixed !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
-        right: auto !important;
-        margin-top: 5px !important;
+        position: absolute !important;
+        margin-top: 2px !important;
+    }
+
+    .dropdown-menu.show {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
     }
 
     .dropdown-menu .dropdown-header {
@@ -982,11 +988,13 @@ header {
     .dropdown-menu {
         min-width: 200px !important;
         max-width: calc(100vw - 16px) !important;
-        position: fixed !important;
-        left: 8px !important;
-        right: 8px !important;
-        transform: none !important;
-        margin: 5px auto !important;
+        position: absolute !important;
+        margin-top: 2px !important;
+    }
+
+    .dropdown-menu.show {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
     }
 
     .dropdown-menu .dropdown-item {
