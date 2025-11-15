@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace ProyectoEcommerce.Services
 {
@@ -22,6 +23,7 @@ namespace ProyectoEcommerce.Services
         private readonly ICompositeViewEngine _viewEngine;
         private readonly ITempDataProvider _tempDataProvider;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<EmailService> _logger;
 
         public EmailService(
             IOptions<MailSettings> mailSettings,
@@ -29,7 +31,8 @@ namespace ProyectoEcommerce.Services
             IWebHostEnvironment env,
             ICompositeViewEngine viewEngine,
             ITempDataProvider tempDataProvider,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            ILogger<EmailService> logger)
         {
             _mailSettings = mailSettings.Value;
             _pdfService = pdfService;
@@ -37,17 +40,32 @@ namespace ProyectoEcommerce.Services
             _viewEngine = viewEngine;
             _tempDataProvider = tempDataProvider;
             _serviceProvider = serviceProvider;
+            _logger = logger;
         }
 
         public async Task SendInvoiceEmailAsync(Buy buy, string recipientEmail, string recipientName)
         {
+            _logger.LogInformation("Iniciando envío de factura por email para orden {BuyId} a {Email}", buy.BuyId, recipientEmail);
+
             try
             {
+                // Validar configuración de email
+                if (string.IsNullOrEmpty(_mailSettings.SmtpHost) || string.IsNullOrEmpty(_mailSettings.Username))
+                {
+                    _logger.LogError("Configuración de email incompleta. SmtpHost: {Host}, Username: {User}",
+                        _mailSettings.SmtpHost, _mailSettings.Username);
+                    throw new Exception("La configuración de email no está completa");
+                }
+
+                _logger.LogDebug("Generando HTML de la factura...");
                 // Generar el HTML de la factura
                 string htmlContent = await RenderViewToStringAsync("InvoiceTemplate", buy);
+                _logger.LogDebug("HTML generado exitosamente. Longitud: {Length} caracteres", htmlContent.Length);
 
+                _logger.LogDebug("Generando PDF de la factura...");
                 // Generar el PDF
                 byte[] pdfBytes = await _pdfService.GenerateInvoicePdfAsync(buy);
+                _logger.LogDebug("PDF generado exitosamente. Tamaño: {Size} bytes", pdfBytes.Length);
 
                 // Configurar el mensaje
                 using (var message = new MailMessage())
@@ -58,26 +76,51 @@ namespace ProyectoEcommerce.Services
                     message.Body = htmlContent;
                     message.IsBodyHtml = true;
 
-                    // Adjuntar el PDF
-                    using (var pdfStream = new MemoryStream(pdfBytes))
+                    _logger.LogDebug("Mensaje de email configurado. De: {From}, Para: {To}, Asunto: {Subject}",
+                        message.From.Address, recipientEmail, message.Subject);
+
+                    // Crear el attachment SIN disponer el stream antes de enviar
+                    var pdfStream = new MemoryStream(pdfBytes);
+                    try
                     {
                         var attachment = new Attachment(pdfStream, $"Factura_{buy.BuyId}.pdf", "application/pdf");
                         message.Attachments.Add(attachment);
+
+                        _logger.LogDebug("PDF adjuntado al mensaje. Nombre: Factura_{BuyId}.pdf", buy.BuyId);
 
                         // Configurar el cliente SMTP
                         using (var smtpClient = new SmtpClient(_mailSettings.SmtpHost, _mailSettings.SmtpPort))
                         {
                             smtpClient.Credentials = new NetworkCredential(_mailSettings.Username, _mailSettings.Password);
                             smtpClient.EnableSsl = true;
+                            smtpClient.Timeout = 30000; // 30 segundos timeout
+
+                            _logger.LogInformation("Enviando email a través de SMTP {Host}:{Port}...",
+                                _mailSettings.SmtpHost, _mailSettings.SmtpPort);
 
                             await smtpClient.SendMailAsync(message);
+
+                            _logger.LogInformation("Email enviado exitosamente a {Email} para orden {BuyId}",
+                                recipientEmail, buy.BuyId);
                         }
+                    }
+                    finally
+                    {
+                        // Asegurar que el stream se dispose después de enviar
+                        pdfStream?.Dispose();
                     }
                 }
             }
+            catch (SmtpException smtpEx)
+            {
+                _logger.LogError(smtpEx, "Error SMTP al enviar email a {Email}. StatusCode: {StatusCode}",
+                    recipientEmail, smtpEx.StatusCode);
+                throw new Exception($"Error SMTP al enviar el email: {smtpEx.Message}. StatusCode: {smtpEx.StatusCode}", smtpEx);
+            }
             catch (Exception ex)
             {
-                // Log del error (puedes usar ILogger aquí)
+                _logger.LogError(ex, "Error al enviar el email de factura a {Email} para orden {BuyId}",
+                    recipientEmail, buy.BuyId);
                 throw new Exception($"Error al enviar el email de factura: {ex.Message}", ex);
             }
         }
