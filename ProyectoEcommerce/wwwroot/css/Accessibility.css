@@ -269,23 +269,128 @@ body.inverted-contrast-mode {
         }
 
 /* Responsive */
+@media (max-width: 992px) {
+    .accessibility-panel {
+        top: 75px;
+        right: 15px;
+        min-width: 260px;
+        max-width: 320px;
+    }
+
+    .option-group h4 {
+        font-size: 14px;
+    }
+
+    .font-size-btn, .contrast-btn {
+        padding: 7px 10px;
+        font-size: 11px;
+        min-width: 55px;
+    }
+}
+
 @media (max-width: 768px) {
     .accessibility-btn {
-        padding: 8px 12px;
+        padding: 6px 10px;
+        font-size: 12px;
     }
 
     .accessibility-panel {
-        top: 70px;
-        right: 15px;
-        left: 15px;
+        top: 65px;
+        right: 10px;
+        left: 10px;
         min-width: auto;
+        max-width: none;
+        padding: 18px;
+    }
+
+    .accessibility-panel::before {
+        font-size: 11px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+    }
+
+    .option-group {
+        margin-bottom: 15px;
+        padding-bottom: 12px;
+    }
+
+    .option-group h4 {
+        font-size: 13px;
+        margin-bottom: 10px;
+    }
+
+    .btn-group {
+        gap: 6px;
+    }
+
+    .font-size-btn, .contrast-btn {
+        padding: 6px 8px;
+        font-size: 10px;
+        min-width: 50px;
+    }
+
+    #reset-accessibility {
+        padding: 7px 14px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .accessibility-panel {
+        top: 60px;
+        right: 5px;
+        left: 5px;
+        padding: 15px;
+    }
+
+    .accessibility-panel::before {
+        font-size: 10px;
+    }
+
+    .option-group h4 {
+        font-size: 12px;
     }
 
     .btn-group {
         flex-direction: column;
+        gap: 8px;
     }
 
     .font-size-btn, .contrast-btn {
         width: 100%;
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+
+    #reset-accessibility {
+        width: 100%;
+        padding: 8px 14px;
+    }
+}
+
+@media (max-width: 400px) {
+    .accessibility-panel {
+        top: 55px;
+        padding: 12px;
+    }
+
+    .accessibility-panel::before {
+        font-size: 9px;
+        margin-bottom: 10px;
+    }
+
+    .option-group {
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+    }
+
+    .option-group h4 {
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
+
+    .font-size-btn, .contrast-btn {
+        padding: 7px 10px;
+        font-size: 10px;
     }
 }
