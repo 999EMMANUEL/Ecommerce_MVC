@@ -213,13 +213,13 @@ namespace ProyectoEcommerce.Services
                 using (var message = new MailMessage())
                 {
                     message.From = new MailAddress(_mailSettings.SenderEmail, _mailSettings.SenderName);
-                    message.To.Add(new MailAddress("pablodavidgomezv@gmail.com", "InnovaTech Soporte"));
+                    message.To.Add(new MailAddress("emmanueljj999@gmail.com", "InnovaTech Soporte"));
                     message.ReplyToList.Add(new MailAddress(contactForm.Email, contactForm.Name)); // Para poder responder fácilmente
                     message.Subject = $"Nuevo mensaje de contacto - {contactForm.Name}";
                     message.Body = htmlBody;
                     message.IsBodyHtml = true;
 
-                    _logger.LogDebug("Mensaje de email configurado. De: {From}, Para: pablodavidgomezv@gmail.com, Asunto: {Subject}",
+                    _logger.LogDebug("Mensaje de email configurado. De: {From}, Para: emmanueljj999@gmail.com, Asunto: {Subject}",
                         message.From.Address, message.Subject);
 
                     // Configurar el cliente SMTP
