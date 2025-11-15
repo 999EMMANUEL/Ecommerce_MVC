@@ -20,6 +20,7 @@
         <h2 class="contact-form-title">Contáctanos</h2>
 
         <form id="contactForm" novalidate>
+            @Html.AntiForgeryToken()
             <div class="contact-form-group">
                 <label for="nombre" class="contact-form-label">
                     Nombre completo <span class="contact-form-required">*</span>
