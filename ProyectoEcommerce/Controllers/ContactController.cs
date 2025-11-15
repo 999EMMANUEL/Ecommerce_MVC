@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ProyectoEcommerce.Models;
@@ -12,11 +13,13 @@ namespace ProyectoEcommerce.Controllers
     {
         private readonly IEmailService _emailService;
         private readonly ILogger<ContactController> _logger;
+        private readonly IAntiforgery _antiforgery;
 
-        public ContactController(IEmailService emailService, ILogger<ContactController> logger)
+        public ContactController(IEmailService emailService, ILogger<ContactController> logger, IAntiforgery antiforgery)
         {
             _emailService = emailService;
             _logger = logger;
+            _antiforgery = antiforgery;
         }
 
         // GET: Contact
@@ -27,13 +30,23 @@ namespace ProyectoEcommerce.Controllers
 
         // POST: Contact/SendMessage
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SendMessage([FromBody] ContactForm contactForm)
         {
             _logger.LogInformation("Recibiendo mensaje de contacto desde {Email}", contactForm?.Email);
 
             try
             {
+                // Validar token antiforgery manualmente
+                try
+                {
+                    await _antiforgery.ValidateRequestAsync(HttpContext);
+                }
+                catch (AntiforgeryValidationException)
+                {
+                    _logger.LogWarning("Token antiforgery inválido");
+                    return BadRequest(new { success = false, message = "Token de seguridad inválido" });
+                }
+
                 if (contactForm == null)
                 {
                     _logger.LogWarning("Formulario de contacto vacío recibido");
