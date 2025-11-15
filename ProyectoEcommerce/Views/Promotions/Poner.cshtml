@@ -1,0 +1,40 @@
+﻿@model ProyectoEcommerce.Models.Product
+
+@{
+    ViewData["Title"] = "Aplicar Promoción a Producto";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-primary"><i class="fas fa-tags"></i> Aplicar Promoción a un Producto</h2>
+
+    <form asp-action="Poner" method="post" class="card shadow p-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Producto</label>
+            <select asp-for="Id" class="form-select" asp-items="ViewBag.Productos">
+                <option value="">-- Selecciona un producto --</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Promoción</label>
+            <select asp-for="PromotionId" class="form-select" asp-items="ViewBag.Promociones">
+                <option value="">-- Selecciona una promoción --</option>
+            </select>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a asp-controller="Promotions" asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-check"></i> Aplicar Promoción
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

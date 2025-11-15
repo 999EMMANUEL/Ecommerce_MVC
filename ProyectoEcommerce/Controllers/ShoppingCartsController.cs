@@ -74,6 +74,70 @@ namespace ProyectoEcommerce.Controllers
             return View(cart);
         }
 
+        // NUEVAS ACCIONES: AddToCart (form) y AddAjax (JSON/AJAX)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddToCart(int productId, int quantity = 1, string returnUrl = null)
+        {
+            var email = User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                // Si no está autenticado, desafiar (redirigir a login)
+                return Challenge();
+            }
+
+            if (quantity < 1) quantity = 1;
+
+            try
+            {
+                await _cartService.AddToCartAsync(email, productId, quantity);
+                TempData["Success"] = "Producto agregado al carrito.";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error agregando producto {ProductId} al carrito del usuario {Email}", productId, email);
+                TempData["Error"] = "No se pudo agregar el producto al carrito.";
+            }
+
+            if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+
+            return RedirectToAction("My");
+        }
+
+        // Endpoint para AJAX que devuelve JSON (usado por productDetailsPublic.js)
+        public class AddAjaxRequest
+        {
+            public int ProductId { get; set; }
+            public int Quantity { get; set; } = 1;
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddAjax([FromBody] AddAjaxRequest request)
+        {
+            if (request == null) return BadRequest(new { success = false, message = "Solicitud inválida" });
+
+            var email = User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return Unauthorized(new { success = false, message = "Debe iniciar sesión" });
+            }
+
+            var qty = request.Quantity < 1 ? 1 : request.Quantity;
+
+            try
+            {
+                await _cartService.AddToCartAsync(email, request.ProductId, qty);
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "AddAjax fallo para usuario {Email} producto {ProductId}", email, request.ProductId);
+                return StatusCode(500, new { success = false, message = "Error al agregar al carrito" });
+            }
+        }
+
         // APLICAR CUPÓN
         [HttpPost]
         [ValidateAntiForgeryToken]

@@ -1,8 +1,11 @@
 ﻿@model ProyectoEcommerce.Models.ShoppingCart
 @using System.Linq
 @using System.Globalization
+@using Microsoft.AspNetCore.Http
 
 @{
+   
+    //  formato personalizado con coma para miles
     var customFormat = new NumberFormatInfo
     {
         NumberDecimalDigits = 0,
@@ -10,18 +13,37 @@
         NumberDecimalSeparator = "."
     };
 
-    var subtotal = Model?.Items.Sum(i => i.Quantity * (i.Product?.Price ?? 0m)) ?? 0m;
+    // Subtotal calculado con precios efectivos (promociones aplicadas)
+    var subtotal = Model?.Items.Sum(i => i.Quantity * (i.Product?.EffectivePrice ?? i.Product?.Price ?? 0m)) ?? 0m;
+    // Subtotal sin promociones (para mostrar descuento por promoción)
+    var subtotalBeforePromotions = Model?.Items.Sum(i => i.Quantity * (i.Product?.Price ?? 0m)) ?? 0m;
+
+    var items = Model?.Items ?? Enumerable.Empty<ProyectoEcommerce.Models.ShoppingCartItem>();
+    decimal promoDiscountTotal = items.Sum(it =>
+    {
+        var original = it.Product?.Price ?? 0m;
+        var effective = it.Product?.EffectivePrice ?? original;
+        var perItemDiscount = Math.Max(0m, original - effective);
+        return perItemDiscount * it.Quantity;
+    });
+
     var ivaRate = 0.13m;
     var iva = Math.Round(subtotal * ivaRate, 2);
+    var total = subtotal + iva;
 
-    decimal discount = ViewBag.CouponDiscount ?? 0m;
-    string couponCode = ViewBag.CouponCode as string;
-
-    var total = subtotal - discount + iva;
-    if (total < 0) total = 0;
+    // Cupón aplicado (enviamos desde el controlador)
+    var couponCode = ViewData["CurrentCouponCode"] as string;
+    var couponPercent = ViewData["CurrentCouponPercent"] as decimal?;
+    var couponDiscount = 0m;
+    if (couponPercent.HasValue)
+    {
+        // La lógica sigue la de la acción Pay: descuento = subtotal * (percent/100) y se resta del total final
+        couponDiscount = Math.Round(subtotal * (couponPercent.Value / 100m), 2);
+    }
+    var totalAfterCoupon = Math.Max(0m, total - couponDiscount);
 }
 
-<h2>Mi carrito</h2>
+<h2 class="mb-4">Mi carrito</h2>
 
 @if (TempData["Error"] != null)
 {
@@ -32,13 +54,6 @@
     <div class="alert alert-success">@TempData["Success"]</div>
 }
 
-@if (!string.IsNullOrEmpty(couponCode) && discount > 0)
-{
-    <div class="alert alert-success">
-        Cupón <strong>@couponCode</strong> aplicado — Descuento: <strong>₡@discount.ToString("N0", customFormat)</strong>
-    </div>
-}
-
 @if (Model == null || !Model.Items.Any())
 {
     <div class="alert alert-info">Tu carrito está vacío.</div>
@@ -46,100 +61,218 @@
 }
 else
 {
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Imagen</th>
-                <th>Producto</th>
-                <th>Precio unidad</th>
-                <th>Cantidad</th>
-                <th>Subtotal</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.Items)
-            {
-                <tr>
-                    <td>
-                        <img src="@Url.Content(item.Product?.ImageUrl ?? "/images/no-image.png")"
-                             style="height:60px;width:60px;object-fit:cover;" />
-                    </td>
-                    <td>@item.Product?.Name</td>
-                    <td>₡@((item.Product?.Price ?? 0).ToString("N0", customFormat))</td>
-                    <td>
-                        <form asp-controller="ShoppingCarts" asp-action="UpdateQuantity" method="post">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="cartId" value="@Model.ShoppingCartId" />
-                            <input type="hidden" name="productId" value="@item.ProductId" />
-                            <input type="number" name="quantity" value="@item.Quantity" min="1" class="form-control d-inline" style="width:90px;" />
-                            <button class="btn btn-outline-primary btn-sm">Actualizar</button>
-                        </form>
-                    </td>
-                    <td>₡@((item.Quantity * (item.Product?.Price ?? 0)).ToString("N0", customFormat))</td>
-                    <td>
-                        <form asp-controller="ShoppingCarts" asp-action="RemoveItem" method="post">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="cartId" value="@Model.ShoppingCartId" />
-                            <input type="hidden" name="productId" value="@item.ProductId" />
-                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card shadow-sm p-3">
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:90px;">Imagen</th>
+                        <th>Producto</th>
+                        <th class="text-center" style="width:140px;">Precio unidad</th>
+                        <th class="text-center" style="width:150px;">Cantidad</th>
+                        <th class="text-end" style="width:150px;">Subtotal</th>
+                        <th style="width:100px;"></th>
+                    </tr>
+                </thead>
 
-    <div class="text-end">
-        <dl class="row justify-content-end">
-            <dt class="col-4">Subtotal:</dt>
-            <dd class="col-4 text-end">₡@subtotal.ToString("N0", customFormat)</dd>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        var originalPrice = item.Product?.Price ?? 0m;
+                        var effectivePrice = item.Product?.EffectivePrice ?? originalPrice;
+                        var itemSubtotal = item.Quantity * effectivePrice;
+                        var discount = (originalPrice - effectivePrice) * item.Quantity;
 
-            @if (discount > 0)
-            {
-                <dt class="col-4 text-success">Descuento (@couponCode):</dt>
-                <dd class="col-4 text-end text-success">-₡@discount.ToString("N0", customFormat)</dd>
-            }
+                        // Calcula porcentaje de descuento real (evitar división por cero)
+                        var discountPercent = 0;
+                        if (originalPrice > 0m)
+                        {
+                            // redondear al entero más cercano
+                            discountPercent = (int)decimal.Round(100m * (originalPrice - effectivePrice) / originalPrice, 0);
+                            if (discountPercent < 0) discountPercent = 0;
+                        }
 
-            <dt class="col-4">IVA:</dt>
-            <dd class="col-4 text-end">₡@iva.ToString("N0", customFormat)</dd>
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="@Url.Content(item.Product?.ImageUrl ?? "/images/no-image.png")"
+                                     class="rounded"
+                                     style="height:65px;width:65px;object-fit:cover;"
+                                     onerror="this.src='/images/no-image.png';" />
+                            </td>
 
-            <dt class="col-4 h5">TOTAL:</dt>
-            <dd class="col-4 h5 text-end">₡@total.ToString("N0", customFormat)</dd>
-        </dl>
+                            <td>
+                                <a asp-controller="Products"
+                                   asp-action="Details"
+                                   asp-route-id="@item.ProductId"
+                                   class="fw-semibold text-decoration-none text-dark">
+                                    @item.Product?.Name
+                                </a>
 
-        <form asp-controller="ShoppingCarts" asp-action="Pay" method="post">
-            @Html.AntiForgeryToken()
-            <button class="btn btn-success btn-lg">Pagar</button>
-        </form>
+                                @* Mostrar badge solo si hay descuento real *@
+                                @if (discountPercent > 0)
+                                {
+                                    <div class="badge bg-danger mt-1">
+                                        @{
+                                            // Preferir BadgeText si existe; si no, mostrar porcentaje calculado
+                                            var badgeText = !string.IsNullOrWhiteSpace(item.Product?.Promotion?.BadgeText)
+                                                ? item.Product.Promotion.BadgeText
+                                                : $"{discountPercent}% OFF";
+                                        }
+                                        @badgeText
+                                    </div>
+                                }
+                            </td>
+
+                            <td class="text-center">
+                                @if (effectivePrice < originalPrice)
+                                {
+                                    <span class="text-muted text-decoration-line-through d-block small">
+                                        ₡@originalPrice.ToString("N0", customFormat)
+                                    </span>
+                                    <strong>₡@effectivePrice.ToString("N0", customFormat)</strong>
+                                }
+                                else
+                                {
+                                    <strong>₡@effectivePrice.ToString("N0", customFormat)</strong>
+                                }
+                            </td>
+
+                            <td class="text-center">
+                                <form asp-controller="ShoppingCarts" asp-action="UpdateQuantity" method="post" class="d-flex justify-content-center">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="cartId" value="@Model.ShoppingCartId" />
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+
+                                    <input type="number"
+                                           name="quantity"
+                                           value="@item.Quantity"
+                                           min="1"
+                                           class="form-control form-control-sm text-center me-2"
+                                           style="width:75px;" />
+
+                                    <button type="submit" class="btn btn-outline-primary btn-sm">Actualizar</button>
+                                </form>
+                            </td>
+
+                            <td class="text-end">
+                                <strong>₡@itemSubtotal.ToString("N0", customFormat)</strong>
+                                @if (discount > 0)
+                                {
+                                    <div class="text-success small">Ahorras ₡@discount.ToString("N0", customFormat)</div>
+                                }
+                            </td>
+
+                            <td class="text-center">
+                                <form asp-controller="ShoppingCarts" asp-action="RemoveItem" method="post" onsubmit="return confirm('¿Eliminar este producto del carrito?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="cartId" value="@Model.ShoppingCartId" />
+                                    <input type="hidden" name="productId" value="@item.ProductId" />
+                                    <button class="btn btn-danger btn-sm">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- RESUMEN DE PAGO -->
+    <div class="card mt-4 shadow-sm">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 text-end">
+
+                    <p class="mb-1"><strong>Subtotal:</strong> ₡@subtotal.ToString("N0", customFormat)</p>
+
+                    @* Mostrar línea de descuento por promociones solo si hay ahorro *@
+                    @if (promoDiscountTotal > 0m)
+                    {
+                        <p class="mb-1 text-success">
+                            <strong>Descuento por promociones:</strong> ₡@promoDiscountTotal.ToString("N0", customFormat)
+                        </p>
+                    }
+
+                    @if (!string.IsNullOrEmpty(couponCode))
+                    {
+                        <p class="mb-1 text-success">
+                            <strong>Cupón (@couponCode):</strong> ₡@couponDiscount.ToString("N0", customFormat)
+                        </p>
+                    }
+
+                    <p class="mb-1"><strong>IVA (13%):</strong> ₡@iva.ToString("N0", customFormat)</p>
+
+                    <h4 class="mt-3"><strong>Total a pagar:</strong> ₡@totalAfterCoupon.ToString("N0", customFormat)</h4>
+
+                    <form id="payForm" asp-controller="ShoppingCarts" asp-action="Pay" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="button" id="btnPay" class="btn btn-success btn-lg mt-3">
+                            Pagar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 }
-
-<form asp-action="ApplyCoupon" method="post" class="mt-4">
-    @Html.AntiForgeryToken()
+<form asp-action="ApplyCoupon" method="post" class="mt-3">
     <div class="input-group">
         <input type="text" name="code" class="form-control" placeholder="Código de cupón" required />
-        <button class="btn btn-primary">Aplicar cupón</button>
+        <button type="submit" class="btn btn-primary">Aplicar cupón</button>
     </div>
 </form>
 
-@if (ViewBag.ActiveCoupons != null)
-{
-    <h5 class="mt-4">Cupones disponibles</h5>
-    <ul class="list-group">
-        @foreach (var c in ViewBag.ActiveCoupons)
-        {
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>@c.Code</strong> — @c.Description
-                    <br /><small>Descuento: @c.DiscountPercent% • Válido hasta @c.ValidTo.ToString("dd/MM/yyyy")</small>
-                </div>
-                <form asp-action="ApplyCoupon" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="code" value="@c.Code" />
-                    <button class="btn btn-outline-primary btn-sm">Usar</button>
-                </form>
-            </li>
-        }
-    </ul>
+<!-- Modal de confirmación antes de pagar -->
+<div class="modal fade" id="confirmPayModal" tabindex="-1" aria-labelledby="confirmPayLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmPayLabel">Confirmar compra</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>Vas a realizar el pago por el siguiente monto:</p>
+        <ul class="list-unstyled">
+            <li>Subtotal: <strong id="confirmSubtotal">₡@subtotal.ToString("N0", customFormat)</strong></li>
+            <li>IVA (@(ivaRate * 100)%): <strong id="confirmIva">₡@iva.ToString("N0", customFormat)</strong></li>
+            <li>Total: <strong id="confirmTotal">₡@totalAfterCoupon.ToString("N0", customFormat)</strong></li>
+        </ul>
+        <p class="text-muted small mb-0">¿Deseas continuar y procesar el pago?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" id="confirmPayBtn" class="btn btn-success">Confirmar y pagar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const btnPay = document.getElementById('btnPay');
+            const confirmModalEl = document.getElementById('confirmPayModal');
+            const confirmModal = new bootstrap.Modal(confirmModalEl);
+            const confirmPayBtn = document.getElementById('confirmPayBtn');
+            const payForm = document.getElementById('payForm');
+
+            btnPay?.addEventListener('click', function () {
+                confirmModal.show();
+            });
+
+            confirmPayBtn?.addEventListener('click', function () {
+                // Feedback visual: deshabilitar botón y mostrar spinner
+                confirmPayBtn.disabled = true;
+                confirmPayBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...';
+                // enviar formulario
+                payForm.submit();
+            });
+
+            // Restaurar estado del botón si se cierra modal (por si el usuario vuelve)
+            confirmModalEl.addEventListener('hidden.bs.modal', function () {
+                confirmPayBtn.disabled = false;
+                confirmPayBtn.innerHTML = 'Confirmar y pagar';
+            });
+        })();
+    </script>
 }

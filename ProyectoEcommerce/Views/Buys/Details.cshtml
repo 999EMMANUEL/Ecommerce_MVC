@@ -1,5 +1,6 @@
 ﻿@model ProyectoEcommerce.Models.Buy
 @using System.Globalization
+@using System.Linq
 
 @{
     ViewData["Title"] = "Factura / Compra";
@@ -13,6 +14,15 @@
     var discount = Model.DiscountAmount;
     var couponCode = Model.CouponCode;
     var items = Model.Items ?? Enumerable.Empty<ProyectoEcommerce.Models.BuyItem>();
+
+    // Calcular descuento por promociones (si Product.Price está disponible)
+    decimal promoDiscountTotal = items.Sum(it =>
+    {
+        var original = it.Product?.Price ?? 0m;
+        var paidUnit = it.UnitPrice;
+        var perItemDiscount = Math.Max(0m, original - paidUnit);
+        return perItemDiscount * it.Quantity;
+    });
 }
 
 <div class="container py-4 invoice-container">
@@ -89,6 +99,9 @@
                     <tbody>
                         @foreach (var it in items)
                         {
+                            var originalPrice = it.Product?.Price ?? it.UnitPrice;
+                            var unitPrice = it.UnitPrice;
+                            var itemPromoDiscount = Math.Max(0m, originalPrice - unitPrice) * it.Quantity;
                             <tr>
                                 <td>
                                     @if (!string.IsNullOrEmpty(it.Product?.ImageUrl))
@@ -122,9 +135,18 @@
                                 </td>
 
                                 <td class="text-center">@it.Quantity</td>
-                                <td class="text-end">₡@it.UnitPrice.ToString("N0", nf)</td>
+                                <td class="text-end">₡@unitPrice.ToString("N0", nf)</td>
                                 <td class="text-end">₡@it.Subtotal.ToString("N0", nf)</td>
                             </tr>
+
+                            @if (itemPromoDiscount > 0)
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td colspan="3" class="text-end small text-muted">Descuento por promoción en este ítem:</td>
+                                    <td class="text-end small text-success">- ₡@itemPromoDiscount.ToString("N0", nf)</td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
@@ -136,10 +158,16 @@
                         <dt class="col-6">Subtotal</dt>
                         <dd class="col-6 text-end">₡@subtotal.ToString("N0", nf)</dd>
 
+                        @if (promoDiscountTotal > 0)
+                        {
+                            <dt class="col-6">Descuento por promociones</dt>
+                            <dd class="col-6 text-end text-success"> ₡@promoDiscountTotal.ToString("N0", nf)</dd>
+                        }
+
                         @if (discount > 0 && !string.IsNullOrEmpty(couponCode))
                         {
-                            <dt class="col-6">Descuento (@couponCode)</dt>
-                            <dd class="col-6 text-end text-success">- ₡@discount.ToString("N0", nf)</dd>
+                            <dt class="col-6">Descuento (cupón) @couponCode</dt>
+                            <dd class="col-6 text-end text-success"> ₡@discount.ToString("N0", nf)</dd>
                         }
 
                         <dt class="col-6">IVA</dt>

@@ -1,6 +1,9 @@
 ﻿@model IEnumerable<ProyectoEcommerce.Models.Product>
+@using System.Globalization
 @{
     ViewData["Title"] = "Home Page";
+    var nf = new CultureInfo("es-CR").NumberFormat;
+    nf.NumberDecimalDigits = 0;
 }
 @section Styles {
     <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
@@ -39,10 +42,16 @@
                             <div class="row justify-content-center">
                                 @foreach (var item in grouped[i])
                                 {
+                                    var originalPrice = item.p.Price;
+                                    var effectivePrice = item.p.EffectivePrice;
+                                    var hasPromotion = item.p.Promotion != null
+                                                        && item.p.Promotion.IsActive
+                                                        && item.p.Promotion.StartDate <= DateTime.UtcNow
+                                                        && item.p.Promotion.EndDate >= DateTime.UtcNow;
                                     <div class="col-md-3">
                                         <div class="product-card mb-4">
                                             <a asp-controller="Products" asp-action="DetailsPublic" asp-route-id="@item.p.Id" class="product-link">
-                                                <div class="product-image">
+                                                <div class="product-image position-relative">
                                                     @{
                                                         string imgSrc = string.Empty;
                                                         if (!string.IsNullOrEmpty(item.p.ImageUrl) &&
@@ -67,6 +76,14 @@
                                                     <div class="product-badge @(item.p.Available ? "available" : "unavailable")">
                                                         @(item.p.Available ? "Disponible" : "Agotado")
                                                     </div>
+
+                                                    @* Badges de promoción *@
+                                                    @if (hasPromotion)
+                                                    {
+                                                        <div class="promotion-badge badge bg-danger position-absolute top-0 start-0 ms-2 mt-2">
+                                                            @item.p.Promotion.BadgeText ?? $"{item.p.Promotion.DiscountPercent}% OFF"
+                                                        </div>
+                                                    }
                                                 </div>
 
                                                 <div class="product-info-clickable text-center">
@@ -74,7 +91,20 @@
                                                     <p class="product-availability">
                                                         @(item.p.Available ? $"En stock ({item.p.Stock} unidades)" : "Sin stock")
                                                     </p>
-                                                    <div class="product-price">₡@item.p.Price.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</div>
+                                                    <div class="product-price">
+                                                        @if (effectivePrice < originalPrice)
+                                                        {
+                                                            <div>
+                                                                <span class="text-decoration-line-through text-muted">₡@originalPrice.ToString("N0", nf)</span>
+                                                                <br />
+                                                                <strong>₡@effectivePrice.ToString("N0", nf)</strong>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <strong>₡@originalPrice.ToString("N0", nf)</strong>
+                                                        }
+                                                    </div>
                                                 </div>
                                             </a>
 
