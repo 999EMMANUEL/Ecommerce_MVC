@@ -2,7 +2,38 @@
 
 ## Problemas Corregidos
 
-### 1. ✅ Error Crítico en EmailService.cs
+### Última actualización: 2025-11-15
+
+### 1. ✅ Validación Mejorada de Datos Antes del Envío
+**Problema:** El método `SendInvoiceEmailAsync` podía recibir objetos `Buy` sin las relaciones necesarias (`Items`, `Customer`) cargadas, causando errores al renderizar la vista.
+
+**Solución:** Agregadas validaciones exhaustivas que verifican:
+- El objeto `Buy` no sea null
+- El email del destinatario sea válido
+- Los `Items` de la compra estén cargados con `.Include()`
+- El `Customer` esté cargado con `.Include()`
+- La configuración de email esté completa
+
+### 2. ✅ Logging Extensivo para Debugging
+**Problema:** Era difícil diagnosticar por qué los emails no se enviaban.
+
+**Solución:** Agregado logging detallado en múltiples puntos:
+- Validación de parámetros de entrada
+- Verificación de datos cargados en `Buy`
+- Configuración de SMTP (host, puerto, usuario)
+- Estado de generación de HTML y PDF
+- Proceso de envío SMTP
+- Errores específicos con detalles completos
+
+### 3. ✅ Mensajes de Error Visibles al Usuario
+**Problema:** Los errores del email se capturaban pero el usuario no veía los detalles.
+
+**Solución:**
+- Los errores ahora se muestran en `TempData["Warning"]` con el detalle completo
+- Incluye tanto el error principal como `InnerException` si existe
+- El usuario puede ver exactamente qué salió mal
+
+### 4. ✅ Error Crítico en EmailService.cs (Corregido Previamente)
 **Problema:** El `MemoryStream` del PDF se estaba disponiendo antes de que el email se enviara, causando que el attachment no pudiera leer los datos.
 
 **Solución:** Reestructurado el código para mantener el stream vivo hasta después del envío:
@@ -37,15 +68,18 @@ finally
 }
 ```
 
-### 2. ✅ Logging Mejorado
+### 5. ✅ Logging Mejorado (Actualizado Hoy)
 Ahora el servicio registra información detallada sobre:
 - Validación de configuración
+- Validación de datos de entrada (Buy, Items, Customer)
 - Generación de HTML y PDF
 - Configuración del mensaje
 - Proceso de envío SMTP
 - Errores específicos (SMTP vs. generales)
+- **NUEVO:** Configuración de SMTP (host, port, username, email)
+- **NUEVO:** Validaciones previas antes de llamar EmailService
 
-### 3. ✅ Timeout SMTP
+### 6. ✅ Timeout SMTP (Corregido Previamente)
 Agregado timeout de 30 segundos para evitar bloqueos indefinidos.
 
 ---
@@ -279,15 +313,33 @@ Si usas Gmail Workspace (G Suite), puedes necesitar configuración adicional:
 
 ## Archivos Modificados
 
-1. **EmailService.cs**
-   - ✅ Corregido manejo de MemoryStream para attachments
-   - ✅ Agregado logging detallado
-   - ✅ Agregado timeout SMTP
-   - ✅ Validación de configuración
-   - ✅ Mejor manejo de excepciones
+### Actualización 2025-11-15:
 
-2. **appsettings.json**
-   - ⚠️ **ACCIÓN REQUERIDA:** Actualiza la contraseña de aplicación
+1. **EmailService.cs** (ProyectoEcommerce/Services/)
+   - ✅ **NUEVO:** Validación exhaustiva de parámetros de entrada (`buy`, `recipientEmail`)
+   - ✅ **NUEVO:** Validación de relaciones cargadas (`Items`, `Customer`)
+   - ✅ **NUEVO:** Logging de configuración SMTP al iniciar envío
+   - ✅ Corregido manejo de MemoryStream para attachments (previo)
+   - ✅ Agregado logging detallado en múltiples puntos
+   - ✅ Agregado timeout SMTP de 30 segundos
+   - ✅ Validación de configuración mejorada
+   - ✅ Mejor manejo de excepciones con mensajes descriptivos
+
+2. **ShoppingCartsController.cs** (ProyectoEcommerce/Controllers/)
+   - ✅ **NUEVO:** Validaciones previas antes de llamar `SendInvoiceEmailAsync`
+   - ✅ **NUEVO:** Verificación de que `Items` y `Customer` estén cargados
+   - ✅ **NUEVO:** Logging adicional antes y después del envío de email
+   - ✅ **NUEVO:** Manejo de errores mejorado con `TempData["Warning"]` que muestra el error completo
+   - ✅ **NUEVO:** Inclusión de `InnerException` en mensajes de error para mejor debugging
+
+3. **CONFIGURACION_EMAIL.md** (Raíz del proyecto)
+   - ✅ **NUEVO:** Documentación actualizada con los nuevos cambios
+   - ✅ Instrucciones detalladas para configuración de Gmail
+   - ✅ Checklist de verificación completo
+   - ✅ Solución de problemas comunes
+
+4. **appsettings.json**
+   - ⚠️ **ACCIÓN REQUERIDA:** Actualiza la contraseña de aplicación si no funciona
 
 ---
 

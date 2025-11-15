@@ -436,18 +436,40 @@ namespace ProyectoEcommerce.Controllers
                 // NUEVO: Enviar factura por email
                 try
                 {
+                    _logger.LogInformation("Intentando enviar factura por email para orden {BuyId} a {Email}", buy.BuyId, email);
+
+                    // Verificar que los datos estén cargados
+                    if (buy.Items == null || !buy.Items.Any())
+                    {
+                        _logger.LogError("Los items de la orden {BuyId} no están cargados antes de enviar el email", buy.BuyId);
+                        throw new InvalidOperationException("Error interno: Los items de la orden no están cargados");
+                    }
+
+                    if (buy.Customer == null)
+                    {
+                        _logger.LogError("El Customer de la orden {BuyId} no está cargado antes de enviar el email", buy.BuyId);
+                        throw new InvalidOperationException("Error interno: El Customer no está cargado");
+                    }
+
                     await _emailService.SendInvoiceEmailAsync(
                         buy,
                         email,
                         buy.Customer?.Name_full ?? email
                     );
 
+                    _logger.LogInformation("Factura enviada exitosamente por email para orden {BuyId}", buy.BuyId);
                     TempData["Success"] = "Pago realizado con éxito. Se ha enviado la factura a tu correo electrónico.";
                 }
                 catch (Exception emailEx)
                 {
-                    _logger.LogError(emailEx, "Error al enviar email de factura para orden {BuyId}", buy.BuyId);
-                    TempData["Success"] = "Pago realizado con éxito. Hubo un problema al enviar el email, pero puedes descargar tu factura desde los detalles de la compra.";
+                    _logger.LogError(emailEx, "Error al enviar email de factura para orden {BuyId}. Detalle: {Message}", buy.BuyId, emailEx.Message);
+
+                    // Mostrar el error real en desarrollo, mensaje genérico en producción
+                    var errorDetail = emailEx.InnerException != null
+                        ? $"{emailEx.Message} - {emailEx.InnerException.Message}"
+                        : emailEx.Message;
+
+                    TempData["Warning"] = $"Pago realizado con éxito. Hubo un problema al enviar el email: {errorDetail}. Puedes descargar tu factura desde los detalles de la compra.";
                 }
 
                 return RedirectToAction("Details", "Buys", new { id = buy.BuyId });

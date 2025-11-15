@@ -26,13 +26,44 @@
 }
 
 <div class="container py-4 invoice-container">
-    @if (TempData["Success"] != null || paid)
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success d-flex align-items-center" role="alert">
+            <i class="fas fa-check-circle me-2" style="font-size:1.2rem"></i>
+            <div>
+                @TempData["Success"]
+            </div>
+        </div>
+    }
+    else if (paid)
     {
         <div class="alert alert-success d-flex align-items-center" role="alert">
             <i class="fas fa-check-circle me-2" style="font-size:1.2rem"></i>
             <div>
                 <strong>Compra realizada</strong>
                 <div class="small">Tu pago se procesó correctamente. Gracias por tu compra.</div>
+            </div>
+        </div>
+    }
+
+    @if (TempData["Warning"] != null)
+    {
+        <div class="alert alert-warning d-flex align-items-center" role="alert">
+            <i class="fas fa-exclamation-triangle me-2" style="font-size:1.2rem"></i>
+            <div>
+                <strong>Atención:</strong>
+                <div class="small">@TempData["Warning"]</div>
+            </div>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger d-flex align-items-center" role="alert">
+            <i class="fas fa-times-circle me-2" style="font-size:1.2rem"></i>
+            <div>
+                <strong>Error:</strong>
+                <div class="small">@TempData["Error"]</div>
             </div>
         </div>
     }

@@ -49,13 +49,42 @@ namespace ProyectoEcommerce.Services
 
             try
             {
+                // Validar parámetros de entrada
+                if (buy == null)
+                {
+                    _logger.LogError("El objeto Buy es null");
+                    throw new ArgumentNullException(nameof(buy), "El objeto Buy no puede ser null");
+                }
+
+                if (string.IsNullOrWhiteSpace(recipientEmail))
+                {
+                    _logger.LogError("El email del destinatario está vacío");
+                    throw new ArgumentException("El email del destinatario no puede estar vacío", nameof(recipientEmail));
+                }
+
+                // Validar que la compra tenga los datos necesarios
+                if (buy.Items == null || !buy.Items.Any())
+                {
+                    _logger.LogError("La orden {BuyId} no tiene items cargados", buy.BuyId);
+                    throw new InvalidOperationException("La orden no tiene items. Asegúrese de cargar la relación Items con Include()");
+                }
+
+                if (buy.Customer == null)
+                {
+                    _logger.LogError("La orden {BuyId} no tiene el Customer cargado", buy.BuyId);
+                    throw new InvalidOperationException("La orden no tiene Customer cargado. Asegúrese de cargar la relación Customer con Include()");
+                }
+
                 // Validar configuración de email
                 if (string.IsNullOrEmpty(_mailSettings.SmtpHost) || string.IsNullOrEmpty(_mailSettings.Username))
                 {
                     _logger.LogError("Configuración de email incompleta. SmtpHost: {Host}, Username: {User}",
-                        _mailSettings.SmtpHost, _mailSettings.Username);
-                    throw new Exception("La configuración de email no está completa");
+                        _mailSettings.SmtpHost ?? "(null)", _mailSettings.Username ?? "(null)");
+                    throw new Exception("La configuración de email no está completa en appsettings.json");
                 }
+
+                _logger.LogInformation("Configuración de email: Host={Host}, Port={Port}, Usuario={User}, Email={Email}",
+                    _mailSettings.SmtpHost, _mailSettings.SmtpPort, _mailSettings.Username, _mailSettings.SenderEmail);
 
                 _logger.LogDebug("Generando HTML de la factura...");
                 // Generar el HTML de la factura
