@@ -1,0 +1,237 @@
+/* catalog.css - Estilos para el catálogo público de productos */
+/* Paleta: Azul marino #1a365d, Rojo #dc2626, Blanco #ffffff */
+
+/* Formulario de filtro */
+.filter-form {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.08);
+}
+
+.filter-form .form-control,
+.filter-form .form-select {
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+}
+
+.filter-form .form-control:focus,
+.filter-form .form-select:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    outline: none;
+}
+
+.filter-form .btn-primary {
+    background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+    border: 2px solid #1a365d;
+    color: #ffffff;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filter-form .btn-primary:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    border-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+/* Productos en catálogo */
+.catalog-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: #1a365d;
+    margin-bottom: 25px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.catalog-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, #dc2626 0%, #1a365d 100%);
+    border-radius: 2px;
+}
+
+/* Tarjetas de producto en catálogo */
+.product-catalog-card {
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.08);
+}
+
+.product-catalog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(26, 54, 93, 0.15);
+    border-color: #dc2626;
+}
+
+.product-catalog-card .card-img-top {
+    height: 200px;
+    object-fit: cover;
+    border-bottom: 2px solid #e2e8f0;
+    transition: transform 0.3s ease;
+}
+
+.product-catalog-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.product-catalog-card .card-body {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.product-catalog-card .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a365d;
+    margin-bottom: 8px;
+    transition: color 0.2s ease;
+}
+
+.product-catalog-card:hover .card-title {
+    color: #dc2626;
+}
+
+.product-catalog-card .text-muted {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 10px;
+}
+
+.product-catalog-card .fw-semibold {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1a365d;
+    margin-bottom: 12px;
+}
+
+.product-catalog-card .btn-outline-primary {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    border: 2px solid #dc2626;
+    color: #ffffff;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 13px;
+    margin-top: auto;
+}
+
+.product-catalog-card .btn-outline-primary:hover {
+    background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+    border-color: #1a365d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.3);
+}
+
+/* Empty state */
+.catalog-empty {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    color: #64748b;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .catalog-title {
+        font-size: 28px;
+    }
+
+    .filter-form {
+        padding: 18px;
+    }
+
+    .product-catalog-card .card-img-top {
+        height: 180px;
+    }
+}
+
+@media (max-width: 768px) {
+    .catalog-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .filter-form {
+        padding: 15px;
+    }
+
+    .filter-form .form-control,
+    .filter-form .form-select,
+    .filter-form .btn-primary {
+        margin-bottom: 10px;
+    }
+
+    .product-catalog-card .card-img-top {
+        height: 160px;
+    }
+
+    .product-catalog-card .card-body {
+        padding: 15px;
+    }
+
+    .product-catalog-card .card-title {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .catalog-title {
+        font-size: 20px;
+    }
+
+    .filter-form {
+        padding: 12px;
+    }
+
+    .product-catalog-card .card-img-top {
+        height: 140px;
+    }
+
+    .product-catalog-card .card-title {
+        font-size: 14px;
+    }
+
+    .product-catalog-card .fw-semibold {
+        font-size: 16px;
+    }
+
+    .product-catalog-card .btn-outline-primary {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+}
