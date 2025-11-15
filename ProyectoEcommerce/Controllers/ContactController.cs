@@ -28,7 +28,7 @@ namespace ProyectoEcommerce.Controllers
         // POST: Contact/SendMessage
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SendMessage([FromBody] ContactForm contactForm)
+        public async Task<IActionResult> SendMessage([FromForm] ContactForm contactForm)
         {
             _logger.LogInformation("Recibiendo mensaje de contacto desde {Email}", contactForm?.Email);
 

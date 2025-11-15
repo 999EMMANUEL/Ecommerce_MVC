@@ -113,29 +113,13 @@
         submitBtn.innerHTML = '<div class="contact-form-loading"></div>Enviando...';
 
         try {
-            // Obtener token antiforgery
-            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            // Preparar FormData con los datos del formulario
+            const formData = new FormData(this.form);
 
-            if (!token) {
-                throw new Error('Token de seguridad no encontrado');
-            }
-
-            // Preparar datos del formulario
-            const formData = {
-                name: document.getElementById('nombre').value.trim(),
-                email: document.getElementById('email').value.trim(),
-                phone: document.getElementById('telefono').value.trim(),
-                message: document.getElementById('mensaje').value.trim()
-            };
-
-            // Enviar datos al servidor
+            // Enviar datos al servidor (el token antiforgery ya está en el FormData)
             const response = await fetch('/Contact/SendMessage', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': token
-                },
-                body: JSON.stringify(formData)
+                body: formData
             });
 
             const result = await response.json();
