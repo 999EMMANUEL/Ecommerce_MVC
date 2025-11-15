@@ -26,6 +26,12 @@
         let isValid = true;
         let errorMessage = '';
 
+        // Ignorar campos que no son del formulario (como el token antiforgery)
+        const validFieldNames = ['nombre', 'email', 'telefono', 'mensaje'];
+        if (!validFieldNames.includes(fieldName)) {
+            return true; // No validar campos no reconocidos
+        }
+
         switch (fieldName) {
             case 'nombre':
                 isValid = this.validateNombre(value);
@@ -74,6 +80,11 @@
     showFieldValidation(field, isValid, errorMessage) {
         const errorElement = document.getElementById(field.name + 'Error');
 
+        // Si no existe el elemento de error, no hacer nada (ej: token antiforgery)
+        if (!errorElement) {
+            return;
+        }
+
         if (isValid) {
             field.classList.remove('error');
             field.classList.add('success');
@@ -87,13 +98,17 @@
     }
 
     validateAllFields() {
-        const fields = this.form.querySelectorAll('input, textarea');
+        // Solo validar los campos del formulario, no el token antiforgery
+        const fieldIds = ['nombre', 'email', 'telefono', 'mensaje'];
         let allValid = true;
 
-        fields.forEach(field => {
-            const isFieldValid = this.validateField(field);
-            if (!isFieldValid) {
-                allValid = false;
+        fieldIds.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                const isFieldValid = this.validateField(field);
+                if (!isFieldValid) {
+                    allValid = false;
+                }
             }
         });
 
