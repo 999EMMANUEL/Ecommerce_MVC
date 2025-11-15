@@ -1,40 +1,105 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=, initial-scale=1.0">
-    <link rel="stylesheet" href="Stylehero.css">
-    <title>Hero</title>
-</head>
-<body>
+@{
+    ViewData["Title"] = "Sobre Nosotros - InnovaTech";
+}
 
-    <div class="Contenedor">
-        <div class="Wrap">
-            <div class="box">
+@section Styles {
+    <link rel="stylesheet" href="~/css/AboutUs.css" asp-append-version="true" />
+}
 
-                <span>Innovatech</span>
-                <h1>Somos los mejores y tenemos lo mejor</h1>
-                <p>
-                    Misión:Nuestra misión es brindar a los usuarios una experiencia agradable a la hora de la compra de los artículos de su interés, buscamos que el servicio ofrecido sea rápido, eficiente y fácil de conllevar para los usuarios tratando de cubrir todas sus necesidades y expectativas.
-                </p>
-                <p>
-                    Visión:A largo plazo buscamos que nuestra empresa sea una entidad que sea reconocida a nivel global como uno de los grandes distribuidores de componentes y equipos, que se caracterice por su simplicidad y eficiencia cubriendo las necesidades del mercado global tecnológico.
-                </p>
-                <div class="Botones">
-                    <a href="Index.cshtml">Empieza a comprar</a>
-
-
-                </div>
-
-
-            </div>
-
-        </div>
-
+<div class="about-container">
+    <div class="about-hero">
+        <h1>InnovaTech</h1>
+        <p class="subtitle">Somos los mejores y tenemos lo mejor</p>
+        <p>
+            Bienvenido a InnovaTech, tu tienda de confianza para componentes tecnológicos de última generación.
+            Nos dedicamos a ofrecer productos de la más alta calidad con un servicio excepcional.
+        </p>
     </div>
 
+    <div class="about-section">
+        <h2>Nuestra Misión</h2>
+        <p>
+            Nuestra misión es brindar a los usuarios una experiencia agradable a la hora de la compra de los artículos de su interés.
+            Buscamos que el servicio ofrecido sea rápido, eficiente y fácil de conllevar para los usuarios, tratando de cubrir todas
+            sus necesidades y expectativas.
+        </p>
+        <p>
+            Nos comprometemos a ofrecer:
+        </p>
+        <ul>
+            <li>Productos de la más alta calidad certificados</li>
+            <li>Atención al cliente personalizada y profesional</li>
+            <li>Entregas rápidas y seguras</li>
+            <li>Precios competitivos y promociones exclusivas</li>
+            <li>Garantía en todos nuestros productos</li>
+        </ul>
+    </div>
 
+    <div class="about-section">
+        <h2>Nuestra Visión</h2>
+        <p>
+            A largo plazo buscamos que nuestra empresa sea una entidad que sea reconocida a nivel global como uno de los grandes
+            distribuidores de componentes y equipos, que se caracterice por su simplicidad y eficiencia cubriendo las necesidades
+            del mercado global tecnológico.
+        </p>
+        <p>
+            Aspiramos a ser líderes en innovación, calidad y servicio al cliente, expandiendo nuestro alcance y
+            construyendo relaciones duraderas con nuestros clientes.
+        </p>
+    </div>
 
+    <div class="about-section">
+        <h2>Nuestros Valores</h2>
+        <div class="values-grid">
+            <div class="value-card">
+                <div class="icon">
+                    <i class="fas fa-award"></i>
+                </div>
+                <h3>Excelencia</h3>
+                <p>
+                    Nos esforzamos por la excelencia en cada producto que ofrecemos y en cada interacción con nuestros clientes.
+                </p>
+            </div>
 
-</body>
-</html>
+            <div class="value-card">
+                <div class="icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h3>Confianza</h3>
+                <p>
+                    Construimos relaciones basadas en la honestidad, transparencia y cumplimiento de nuestras promesas.
+                </p>
+            </div>
+
+            <div class="value-card">
+                <div class="icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <h3>Innovación</h3>
+                <p>
+                    Buscamos constantemente nuevas formas de mejorar y ofrecer las últimas tecnologías a nuestros clientes.
+                </p>
+            </div>
+
+            <div class="value-card">
+                <div class="icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3>Servicio al Cliente</h3>
+                <p>
+                    Nuestros clientes son nuestra prioridad. Nos dedicamos a superar sus expectativas en cada momento.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta-section">
+        <h2>¿Listo para Comenzar?</h2>
+        <p>
+            Descubre nuestra amplia selección de productos tecnológicos y únete a miles de clientes satisfechos que confían en InnovaTech.
+        </p>
+        <a asp-controller="Products" asp-action="Public" class="cta-button">
+            Empieza a Comprar
+        </a>
+    </div>
+</div>

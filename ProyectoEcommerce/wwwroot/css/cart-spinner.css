@@ -1,11 +1,29 @@
 ﻿/* Estilos para el botón de agregar al carrito con spinner */
+/* Paleta: Azul marino #1a365d, Rojo #dc2626, Blanco #ffffff */
+
 .add-to-cart-btn {
     position: relative;
     min-height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    color: #ffffff;
+    border: 2px solid #dc2626;
+    border-radius: 8px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
 }
+
+    .add-to-cart-btn:hover:not(:disabled) {
+        background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+        border-color: #1a365d;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(26, 54, 93, 0.3);
+    }
 
     .add-to-cart-btn .button-text {
         display: flex;
@@ -15,14 +33,63 @@
 
     .add-to-cart-btn .spinner-border {
         margin-left: 8px;
+        width: 1.2rem;
+        height: 1.2rem;
     }
 
     .add-to-cart-btn:disabled {
-        opacity: 0.7;
+        opacity: 0.6;
         cursor: not-allowed;
+        background: #94a3b8;
+        border-color: #94a3b8;
+        transform: none;
+        box-shadow: none;
     }
 
 /* Asegurar que el input de cantidad se vea bien */
 .add-to-cart-form .input-group {
     flex-shrink: 0;
+}
+
+    .add-to-cart-form .input-group input {
+        border: 2px solid #cbd5e1;
+        transition: all 0.3s ease;
+    }
+
+        .add-to-cart-form .input-group input:focus {
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .add-to-cart-btn {
+        min-height: 42px;
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+
+    .add-to-cart-btn .spinner-border {
+        width: 1rem;
+        height: 1rem;
+    }
+
+    .add-to-cart-form .input-group {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .add-to-cart-btn {
+        min-height: 38px;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .add-to-cart-btn .spinner-border {
+        width: 0.9rem;
+        height: 0.9rem;
+        margin-left: 6px;
+    }
 }
