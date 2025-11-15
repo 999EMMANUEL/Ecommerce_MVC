@@ -18,7 +18,6 @@ namespace ProyectoEcommerce.Services
     public class EmailService : IEmailService
     {
         private readonly MailSettings _mailSettings;
-        private readonly IPdfService _pdfService;
         private readonly IWebHostEnvironment _env;
         private readonly ICompositeViewEngine _viewEngine;
         private readonly ITempDataProvider _tempDataProvider;
@@ -27,7 +26,6 @@ namespace ProyectoEcommerce.Services
 
         public EmailService(
             IOptions<MailSettings> mailSettings,
-            IPdfService pdfService,
             IWebHostEnvironment env,
             ICompositeViewEngine viewEngine,
             ITempDataProvider tempDataProvider,
@@ -35,7 +33,6 @@ namespace ProyectoEcommerce.Services
             ILogger<EmailService> logger)
         {
             _mailSettings = mailSettings.Value;
-            _pdfService = pdfService;
             _env = env;
             _viewEngine = viewEngine;
             _tempDataProvider = tempDataProvider;
@@ -91,12 +88,7 @@ namespace ProyectoEcommerce.Services
                 string htmlContent = await RenderViewToStringAsync("InvoiceTemplate", buy);
                 _logger.LogDebug("HTML generado exitosamente. Longitud: {Length} caracteres", htmlContent.Length);
 
-                _logger.LogDebug("Generando PDF de la factura...");
-                // Generar el PDF
-                byte[] pdfBytes = await _pdfService.GenerateInvoicePdfAsync(buy);
-                _logger.LogDebug("PDF generado exitosamente. Tamaño: {Size} bytes", pdfBytes.Length);
-
-                // Configurar el mensaje
+                // Configurar el mensaje (sin adjunto PDF)
                 using (var message = new MailMessage())
                 {
                     message.From = new MailAddress(_mailSettings.SenderEmail, _mailSettings.SenderName);
@@ -108,35 +100,20 @@ namespace ProyectoEcommerce.Services
                     _logger.LogDebug("Mensaje de email configurado. De: {From}, Para: {To}, Asunto: {Subject}",
                         message.From.Address, recipientEmail, message.Subject);
 
-                    // Crear el attachment SIN disponer el stream antes de enviar
-                    var pdfStream = new MemoryStream(pdfBytes);
-                    try
+                    // Configurar el cliente SMTP
+                    using (var smtpClient = new SmtpClient(_mailSettings.SmtpHost, _mailSettings.SmtpPort))
                     {
-                        var attachment = new Attachment(pdfStream, $"Factura_{buy.BuyId}.pdf", "application/pdf");
-                        message.Attachments.Add(attachment);
+                        smtpClient.Credentials = new NetworkCredential(_mailSettings.Username, _mailSettings.Password);
+                        smtpClient.EnableSsl = true;
+                        smtpClient.Timeout = 30000; // 30 segundos timeout
 
-                        _logger.LogDebug("PDF adjuntado al mensaje. Nombre: Factura_{BuyId}.pdf", buy.BuyId);
+                        _logger.LogInformation("Enviando email con factura HTML (sin adjunto PDF) a través de SMTP {Host}:{Port}...",
+                            _mailSettings.SmtpHost, _mailSettings.SmtpPort);
 
-                        // Configurar el cliente SMTP
-                        using (var smtpClient = new SmtpClient(_mailSettings.SmtpHost, _mailSettings.SmtpPort))
-                        {
-                            smtpClient.Credentials = new NetworkCredential(_mailSettings.Username, _mailSettings.Password);
-                            smtpClient.EnableSsl = true;
-                            smtpClient.Timeout = 30000; // 30 segundos timeout
+                        await smtpClient.SendMailAsync(message);
 
-                            _logger.LogInformation("Enviando email a través de SMTP {Host}:{Port}...",
-                                _mailSettings.SmtpHost, _mailSettings.SmtpPort);
-
-                            await smtpClient.SendMailAsync(message);
-
-                            _logger.LogInformation("Email enviado exitosamente a {Email} para orden {BuyId}",
-                                recipientEmail, buy.BuyId);
-                        }
-                    }
-                    finally
-                    {
-                        // Asegurar que el stream se dispose después de enviar
-                        pdfStream?.Dispose();
+                        _logger.LogInformation("Email con factura HTML enviado exitosamente a {Email} para orden {BuyId}",
+                            recipientEmail, buy.BuyId);
                     }
                 }
             }

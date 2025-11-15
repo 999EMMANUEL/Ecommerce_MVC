@@ -4,7 +4,30 @@
 
 ### Última actualización: 2025-11-15
 
-### 1. ✅ **CRÍTICO**: Vista InvoiceTemplate No Encontrada (Actualización 2025-11-15)
+### 1. ✅ **MÁS RECIENTE**: Eliminado PDF Adjunto del Email (Actualización 2025-11-15)
+**Problema:** iText7 lanzaba "Unknown PdfException" al intentar generar el PDF de la factura.
+
+**Error reportado:**
+```
+Error generando PDF: Unknown PdfException
+```
+
+**Solución:** Simplificar el envío de email eliminando completamente la generación de PDF:
+- **Solo se envía HTML** de la factura en el cuerpo del email
+- **Sin adjuntos PDF** que puedan causar errores
+- Eliminada dependencia de `IPdfService` en `EmailService`
+- El usuario ve la factura completa y bonita en su email
+- La factura sigue disponible en la página de detalles de compra
+
+**Beneficios:**
+- ✅ Más confiable - un punto de fallo menos
+- ✅ Más rápido - no genera PDF
+- ✅ Mejor experiencia - factura visible directamente en el email
+- ✅ Funciona en todos los clientes de email que soportan HTML
+
+**Nota:** `PdfService` se mantiene en el proyecto por si se necesita en otros lugares (ej: botón de descargar PDF desde la página de detalles).
+
+### 2. ✅ **CRÍTICO**: Vista InvoiceTemplate No Encontrada (Actualización anterior)
 **Problema:** El ViewEngine no podía encontrar la vista `InvoiceTemplate.cshtml` aunque existía.
 
 **Error reportado:**
@@ -35,7 +58,7 @@ if (!viewResult.Success)
 - `FindView()` está diseñado para buscar vistas dentro del contexto de una petición HTTP normal
 - `GetView()` usa rutas absolutas y funciona mejor con `DefaultHttpContext`
 
-### 2. ✅ Validación Mejorada de Datos Antes del Envío
+### 3. ✅ Validación Mejorada de Datos Antes del Envío
 **Problema:** El método `SendInvoiceEmailAsync` podía recibir objetos `Buy` sin las relaciones necesarias (`Items`, `Customer`) cargadas, causando errores al renderizar la vista.
 
 **Solución:** Agregadas validaciones exhaustivas que verifican:
@@ -45,7 +68,7 @@ if (!viewResult.Success)
 - El `Customer` esté cargado con `.Include()`
 - La configuración de email esté completa
 
-### 2. ✅ Logging Extensivo para Debugging
+### 4. ✅ Logging Extensivo para Debugging
 **Problema:** Era difícil diagnosticar por qué los emails no se enviaban.
 
 **Solución:** Agregado logging detallado en múltiples puntos:
@@ -56,7 +79,7 @@ if (!viewResult.Success)
 - Proceso de envío SMTP
 - Errores específicos con detalles completos
 
-### 3. ✅ Mensajes de Error Visibles al Usuario (Actualización previa)
+### 5. ✅ Mensajes de Error Visibles al Usuario (Actualización previa)
 **Problema:** Los errores del email se capturaban pero el usuario no veía los detalles.
 
 **Solución:**
@@ -65,7 +88,7 @@ if (!viewResult.Success)
 - El usuario puede ver exactamente qué salió mal
 - Vista `Buys/Details.cshtml` actualizada para mostrar alertas de Warning y Error
 
-### 4. ✅ Error Crítico en EmailService.cs (Corregido Previamente)
+### 6. ✅ Error Crítico en EmailService.cs (Corregido Previamente)
 **Problema:** El `MemoryStream` del PDF se estaba disponiendo antes de que el email se enviara, causando que el attachment no pudiera leer los datos.
 
 **Solución:** Reestructurado el código para mantener el stream vivo hasta después del envío:
@@ -100,7 +123,7 @@ finally
 }
 ```
 
-### 5. ✅ Logging Mejorado (Actualizado Hoy)
+### 7. ✅ Logging Mejorado (Actualizado Hoy)
 Ahora el servicio registra información detallada sobre:
 - Validación de configuración
 - Validación de datos de entrada (Buy, Items, Customer)
@@ -111,7 +134,7 @@ Ahora el servicio registra información detallada sobre:
 - **NUEVO:** Configuración de SMTP (host, port, username, email)
 - **NUEVO:** Validaciones previas antes de llamar EmailService
 
-### 6. ✅ Timeout SMTP (Corregido Previamente)
+### 8. ✅ Timeout SMTP (Corregido Previamente)
 Agregado timeout de 30 segundos para evitar bloqueos indefinidos.
 
 ---
@@ -345,13 +368,23 @@ Si usas Gmail Workspace (G Suite), puedes necesitar configuración adicional:
 
 ## Archivos Modificados
 
-### 🔥 Última Corrección Crítica (2025-11-15):
+### 🔥 Último Cambio (2025-11-15):
+
+**EmailService.cs** - Eliminación de PDF adjunto
+- ✅ **IMPORTANTE:** Eliminada generación de PDF del flujo de envío de emails
+- ✅ Solo se envía HTML de factura (sin adjunto)
+- ✅ Eliminada dependencia de `IPdfService` del constructor
+- ✅ Eliminado campo privado `_pdfService`
+- ✅ Código más simple y confiable
+- ✅ Esto resuelve el error: "Error generando PDF: Unknown PdfException"
+
+### Corrección Previa (2025-11-15):
 
 **EmailService.cs y PdfService.cs** - Corrección de búsqueda de vista
 - ✅ **CRÍTICO:** Cambiado `FindView()` por `GetView()` en método `RenderViewToStringAsync()`
 - ✅ Mejorados mensajes de error para mostrar ubicaciones buscadas
 - ✅ Cambiado `ArgumentNullException` por `FileNotFoundException`
-- ✅ Esto resuelve el error: "No se encontró la vista InvoiceTemplate"
+- ✅ Esto resolvió el error: "No se encontró la vista InvoiceTemplate"
 
 ### Actualización 2025-11-15 (Mejoras previas):
 
