@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProyectoEcommerce.Data;
+using ProyectoEcommerce.Models;
 using ProyectoEcommerce.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,13 @@ builder.Services.AddDbContext<ProyectoEcommerceContext>(opciones =>
                 maxRetryDelay: TimeSpan.FromSeconds(30),
                 errorNumbersToAdd: null);
         }));
+
+// Configurar MailSettings
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+
+// Registrar servicios de Email y PDF
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IPdfService, PdfService>();
 
 // CONFIGURACI�N DE IDENTITY CON ROLES 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
