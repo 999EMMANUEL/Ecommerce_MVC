@@ -1,89 +1,67 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using ProyectoEcommerce.Models;
+using ProyectoEcommerce.Services;
+using System;
+using System.Threading.Tasks;
 
 namespace ProyectoEcommerce.Controllers
 {
     public class ContactController : Controller
     {
-        // GET: ContactController
-        
-        // GET: ContactController?branch=central
+        private readonly IEmailService _emailService;
+        private readonly ILogger<ContactController> _logger;
+
+        public ContactController(IEmailService emailService, ILogger<ContactController> logger)
+        {
+            _emailService = emailService;
+            _logger = logger;
+        }
+
+        // GET: Contact
         public ActionResult Index()
         {
-           
-         
-
             return View();
         }
 
-     
-
-        // GET: ContactController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: ContactController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: ContactController/Create
+        // POST: Contact/SendMessage
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> SendMessage([FromBody] ContactForm contactForm)
         {
+            _logger.LogInformation("Recibiendo mensaje de contacto desde {Email}", contactForm?.Email);
+
             try
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+                if (contactForm == null)
+                {
+                    _logger.LogWarning("Formulario de contacto vacío recibido");
+                    return BadRequest(new { success = false, message = "Datos del formulario no válidos" });
+                }
 
-        // GET: ContactController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogWarning("Modelo de contacto inválido");
+                    return BadRequest(new { success = false, message = "Por favor completa todos los campos obligatorios" });
+                }
 
-        // POST: ContactController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+                // Enviar el email
+                await _emailService.SendContactEmailAsync(contactForm);
 
-        // GET: ContactController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+                _logger.LogInformation("Email de contacto procesado exitosamente desde {Email}", contactForm.Email);
 
-        // POST: ContactController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
+                return Ok(new { success = true, message = "Mensaje enviado correctamente. Te contactaremos pronto." });
             }
-            catch
+            catch (Exception ex)
             {
-                return View();
+                _logger.LogError(ex, "Error al procesar mensaje de contacto desde {Email}", contactForm?.Email);
+
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Error al enviar el mensaje. Por favor intenta nuevamente o contáctanos directamente."
+                });
             }
         }
     }

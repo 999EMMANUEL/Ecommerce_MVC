@@ -6,5 +6,6 @@ namespace ProyectoEcommerce.Services
     public interface IEmailService
     {
         Task SendInvoiceEmailAsync(Buy buy, string recipientEmail, string recipientName);
+        Task SendContactEmailAsync(ContactForm contactForm);
     }
 }
