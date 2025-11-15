@@ -1,136 +1,183 @@
 ﻿/* Estilos para el mapa */
+/* Paleta: Azul marino #1a365d, Rojo #dc2626, Blanco #ffffff */
+
 .map-wrapper {
     position: relative;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    margin-bottom: 1rem;
+    box-shadow: 0 8px 25px rgba(26, 54, 93, 0.15);
+    margin-bottom: 1.5rem;
+    border: 2px solid #e2e8f0;
 }
 
 #map {
     height: 500px;
     width: 100%;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    background-color: #f8f9fa; /* Color de fondo temporal */
+    border-radius: 12px;
+    border: none;
+    background-color: #f8fafc;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #6c757d;
+    color: #64748b;
 }
 
     /* Mensaje temporal mientras se carga el mapa */
     #map::before {
         content: "Cargando mapa...";
         font-style: italic;
+        font-weight: 600;
+        color: #1a365d;
     }
 
 .map-actions {
     display: flex;
-    gap: 10px;
-    margin-top: 10px;
+    gap: 12px;
+    margin-top: 15px;
+    flex-wrap: wrap;
 }
 
 #locate-me {
-    padding: 8px 16px;
-    background-color: #4285F4;
-    color: white;
-    border: none;
-    border-radius: 4px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+    color: #ffffff;
+    border: 2px solid #1a365d;
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
     font-size: 14px;
-    transition: background-color 0.3s;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
 }
 
     #locate-me:hover {
-        background-color: #3367D6;
+        background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+        border-color: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
     }
 
 /* Estilos para las tarjetas de sucursal */
 .branch-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 18px;
     transition: all 0.3s ease;
     cursor: pointer;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(26, 54, 93, 0.08);
 }
 
     .branch-card:hover, .branch-card.active {
-        border-color: #4285F4;
-        box-shadow: 0 4px 12px rgba(66, 133, 244, 0.15);
-        transform: translateY(-2px);
+        border-color: #dc2626;
+        box-shadow: 0 8px 25px rgba(220, 38, 38, 0.2);
+        transform: translateY(-4px);
     }
 
 .branch-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
 }
 
 .branch-name {
-    font-size: 1.1rem;
-    color: #202124;
+    font-size: 1.2rem;
+    color: #1a365d;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
 .branch-distance {
-    background-color: #34A853;
-    color: white;
-    padding: 4px 8px;
-    border-radius: 16px;
-    font-size: 0.8rem;
-    font-weight: 500;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: #ffffff;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
 .branch-body div {
-    margin-bottom: 8px;
-    font-size: 0.9rem;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    line-height: 1.6;
 }
 
 .branch-address {
-    color: #5f6368;
+    color: #64748b;
+    font-weight: 500;
 }
 
 .branch-hours {
-    color: #5f6368;
+    color: #64748b;
+    font-weight: 500;
 }
 
 .branch-phone a {
-    color: #4285F4;
+    color: #1a365d;
     text-decoration: none;
+    font-weight: 700;
+    transition: all 0.2s ease;
 }
 
     .branch-phone a:hover {
+        color: #dc2626;
         text-decoration: underline;
     }
 
 .branch-payment {
-    color: #34A853;
-    font-weight: 500;
+    color: #059669;
+    font-weight: 700;
 }
 
 .map-branches-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-top: 1rem;
+    gap: 2.5rem;
+    margin-top: 1.5rem;
 }
 
 .section-title {
     text-align: center;
-    margin-bottom: 1.5rem;
-    color: #202124;
-    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #1a365d;
+    font-size: 2.5rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    padding-bottom: 15px;
 }
 
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, #dc2626 0%, #1a365d 100%);
+        border-radius: 2px;
+    }
+
 .branches-title {
-    color: #202124;
-    margin-bottom: 1rem;
-    font-size: 1.5rem;
+    color: #1a365d;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .search-box {
@@ -140,67 +187,142 @@
 
     .search-box input {
         width: 100%;
-        padding: 10px 15px;
-        padding-right: 40px;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        font-size: 14px;
+        padding: 12px 18px;
+        padding-right: 45px;
+        border: 2px solid #cbd5e1;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #ffffff;
+        color: #1a365d;
     }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
 
     .search-box i {
         position: absolute;
         right: 15px;
         top: 50%;
         transform: translateY(-50%);
-        color: #5f6368;
+        color: #64748b;
+        font-size: 16px;
     }
 
 /* Diseño responsivo */
+@media (max-width: 992px) {
+    .map-branches-grid {
+        gap: 2rem;
+    }
+
+    .section-title {
+        font-size: 2.2rem;
+    }
+
+    .branches-title {
+        font-size: 1.6rem;
+    }
+}
+
 @media (max-width: 768px) {
     .map-branches-grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
 
     #map {
-        height: 300px;
+        height: 350px;
     }
 
     .branch-header {
         flex-direction: column;
-        gap: 8px;
+        gap: 10px;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .branches-title {
+        font-size: 1.4rem;
+    }
+
+    .branch-card {
+        padding: 18px 15px;
+    }
+
+    .map-actions {
+        gap: 10px;
+    }
+
+    #locate-me {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    #map {
+        height: 280px;
     }
 
     .section-title {
         font-size: 1.5rem;
     }
+
+    .branches-title {
+        font-size: 1.2rem;
+    }
+
+    .branch-name {
+        font-size: 1rem;
+    }
+
+    .branch-card {
+        padding: 15px 12px;
+    }
+
+    .search-box input {
+        padding: 10px 15px;
+        padding-right: 40px;
+        font-size: 14px;
+    }
 }
 
 /* Estilos para la ventana de información del mapa */
 .map-info-window {
-    padding: 10px;
-    max-width: 250px;
+    padding: 15px;
+    max-width: 280px;
 }
 
     .map-info-window h3 {
-        margin: 0 0 10px 0;
-        color: #202124;
-        font-size: 16px;
+        margin: 0 0 12px 0;
+        color: #1a365d;
+        font-size: 18px;
+        font-weight: 700;
     }
 
     .map-info-window p {
-        margin: 5px 0;
+        margin: 6px 0;
         font-size: 14px;
-        color: #5f6368;
+        color: #64748b;
+        line-height: 1.6;
     }
 
 /* Mensaje de error si la API key falla */
 .map-error {
     display: none;
     text-align: center;
-    padding: 20px;
-    background-color: #fff3cd;
-    border: 1px solid #ffeaa7;
-    border-radius: 8px;
-    color: #856404;
-    margin-top: 10px;
+    padding: 25px;
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border: 2px solid #dc2626;
+    border-radius: 12px;
+    color: #991b1b;
+    margin-top: 15px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
 }

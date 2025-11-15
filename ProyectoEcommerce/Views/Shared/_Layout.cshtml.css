@@ -1,5 +1,5 @@
-﻿/* Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-for details on configuring this project to bundle and minify static web assets. */
+﻿/* Layout Styles - InnovaTech */
+/* Paleta: Azul marino #1a365d, Rojo #dc2626, Blanco #ffffff */
 
 a.navbar-brand {
   white-space: normal;
@@ -8,41 +8,127 @@ a.navbar-brand {
 }
 
 a {
-  color: #0077cc;
+  color: #1a365d;
+  transition: color 0.3s ease;
 }
+
+  a:hover {
+    color: #dc2626;
+  }
 
 .btn-primary {
   color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+  background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+  border: 2px solid #1a365d;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.2);
 }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    border-color: #dc2626;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.3);
+  }
 
 .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
   color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+  background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+  border-color: #1a365d;
+  font-weight: 700;
 }
 
 .border-top {
-  border-top: 1px solid #e5e5e5;
+  border-top: 2px solid #e2e8f0;
 }
+
 .border-bottom {
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2px solid #e2e8f0;
 }
 
 .box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+  box-shadow: 0 4px 12px rgba(26, 54, 93, 0.08);
 }
 
 button.accept-policy {
   font-size: 1rem;
   line-height: inherit;
+  background: linear-gradient(135deg, #1a365d 0%, #2563eb 100%);
+  color: #ffffff;
+  border: 2px solid #1a365d;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
+  button.accept-policy:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    border-color: #dc2626;
+  }
+
 .footer {
-  position: absolute;
+  position: relative;
   bottom: 0;
   width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
+  padding: 20px 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  border-top: 3px solid #dc2626;
+  box-shadow: 0 -4px 12px rgba(26, 54, 93, 0.08);
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+  .btn-primary {
+    font-size: 0.95rem;
+    padding: 0.45rem 0.9rem;
+  }
+
+  .footer {
+    padding: 15px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  a.navbar-brand {
+    font-size: 1.1rem;
+  }
+
+  .btn-primary {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  button.accept-policy {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .footer {
+    padding: 12px 0;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  a.navbar-brand {
+    font-size: 1rem;
+  }
+
+  .btn-primary {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.7rem;
+  }
+
+  button.accept-policy {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.7rem;
+  }
+
+  .footer {
+    padding: 10px 0;
+    font-size: 0.8rem;
+  }
 }
