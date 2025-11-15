@@ -103,7 +103,7 @@
 
                 <a class="nav-link" asp-controller="AboutUs" asp-action="Index">SOBRE NOSOTROS</a>
                 <a class="nav-link" asp-controller="Faqs" asp-action="Public">PREGUNTAS FRECUENTES</a>
-                <a class="nav-link" asp-controller="Promotions" asp-action="Index">PROMOCIONES</a>
+                <a class="nav-link" asp-controller="Promotions" asp-action="Public">PROMOCIONES</a>
                 <a class="nav-link" asp-controller="Contact" asp-action="Index">CONTÁCTENOS</a>
 
                 @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))

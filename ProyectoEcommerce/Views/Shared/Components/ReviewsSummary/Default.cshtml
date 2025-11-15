@@ -1,0 +1,45 @@
+﻿@model IEnumerable<ProyectoEcommerce.Models.Review>
+
+@if (Model != null && Model.Any())
+{
+    <div class="card shadow-sm mb-3">
+        <div class="card-header py-2">
+            <strong>Últimas reseñas</strong>
+        </div>
+        <div class="card-body p-2">
+            @foreach (var r in Model)
+            {
+                <div class="mb-2 border-bottom pb-2">
+                    <div class="d-flex justify-content-between">
+                        <div class="small fw-semibold">
+                            @r.Product?.Name
+                        </div>
+                        <div class="small">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= r.Rating)
+                                {
+                                    <i class="fas fa-star"></i>   @* estrella llena *@
+                                }
+                                else
+                                {
+                                    <i class="far fa-star"></i>   @* estrella vacía *@
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <div class="small text-muted">
+                        @r.Comment
+                    </div>
+
+                    <div class="text-end">
+                        <span class="badge bg-light text-muted small">
+                            @r.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")
+                        </span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

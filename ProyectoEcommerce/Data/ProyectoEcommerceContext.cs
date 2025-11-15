@@ -30,6 +30,9 @@ namespace ProyectoEcommerce.Data
         // Nuevo DbSet para promociones
         public DbSet<Promotion> Promotions { get; set; }
 
+        public DbSet<Review> Reviews { get; set; }
+
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

@@ -150,48 +150,9 @@
 
 <img src="~/images/Logos/Whats.png" class="whatsapp-btn" title="Contactar por WhatsApp" />
 
-<!-- Reseñas de usuarios -->
 <section id="user-reviews" class="user-reviews-section container">
     <h2 class="reviews-title">Reseñas de clientes</h2>
 
-    <div class="reviews-grid">
-        <article class="review-card" tabindex="0" aria-labelledby="r1-name" aria-describedby="r1-text">
-            <header class="review-header">
-                <div class="review-avatar" aria-hidden="true">AJ</div>
-                <div class="review-meta">
-                    <strong id="r1-name" class="review-name">Ana Jiménez</strong>
-                    <div class="review-payment">Método: <span class="payment-method">Tarjeta de crédito</span></div>
-                </div>
-            </header>
-            <div class="review-body" id="r1-text">
-                <p>El producto llegó rápido y en perfecto estado. La atención al cliente resolvió mi duda en minutos. ¡Recomendado!</p>
-            </div>
-        </article>
-
-        <article class="review-card" tabindex="0" aria-labelledby="r2-name" aria-describedby="r2-text">
-            <header class="review-header">
-                <div class="review-avatar" aria-hidden="true">CR</div>
-                <div class="review-meta">
-                    <strong id="r2-name" class="review-name">Carlos Rodríguez</strong>
-                    <div class="review-payment">Método: <span class="payment-method">PayPal</span></div>
-                </div>
-            </header>
-            <div class="review-body" id="r2-text">
-                <p>Buena relación precio-calidad. La garantía funcionó sin problemas. Volvería a comprar.</p>
-            </div>
-        </article>
-
-        <article class="review-card" tabindex="0" aria-labelledby="r3-name" aria-describedby="r3-text">
-            <header class="review-header">
-                <div class="review-avatar" aria-hidden="true">ML</div>
-                <div class="review-meta">
-                    <strong id="r3-name" class="review-name">María López</strong>
-                    <div class="review-payment">Método: <span class="payment-method">Efectivo / Contra entrega</span></div>
-                </div>
-            </header>
-            <div class="review-body" id="r3-text">
-                <p>Muy contenta con la compra. El empaque estaba muy bien y las instrucciones claras.</p>
-            </div>
-        </article>
-    </div>
+   
+    @await Component.InvokeAsync("ReviewsSummary", new { take = 6 })
 </section>

@@ -32,19 +32,25 @@ namespace ProyectoEcommerce.Models
         // filtra para no incluir productos creados en las últimas X horas
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        //  para destacados manuales por el admin
+       
         public bool IsFeatured { get; set; } = false;
 
         // Relaciones
         public ICollection<ShoppingCartItem> ShoppingCartItems { get; set; } = new List<ShoppingCartItem>();
         public ICollection<BuyItem> BuyItems { get; set; } = new List<BuyItem>();
 
-        // --- Relación opcional con Promotion ---
+     
         public int? PromotionId { get; set; }
         public virtual Promotion? Promotion { get; set; }
 
+
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
+
+
+
+
         // ----------------- Helpers de precio con promoción -----------------
-        // Propiedad no mapeada que devuelve el precio efectivo según la promoción (si aplica)
+
         [NotMapped]
         public decimal EffectivePrice => CalculateEffectivePrice(DateTime.UtcNow);
 
@@ -52,7 +58,7 @@ namespace ProyectoEcommerce.Models
         [NotMapped]
         public decimal DiscountAmount => Math.Max(0m, Price - EffectivePrice);
 
-        // Calcula el precio efectivo en una fecha dada (útil para pruebas o render en distinto timezone)
+        // Calcula el precio efectivo en una fecha dada (
         public decimal CalculateEffectivePrice(DateTime nowUtc)
         {
             if (Promotion == null) return Price;

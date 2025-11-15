@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProyectoEcommerce.Data;
 
@@ -11,9 +12,11 @@ using ProyectoEcommerce.Data;
 namespace ProyectoEcommerce.Migrations
 {
     [DbContext(typeof(ProyectoEcommerceContext))]
-    partial class ProyectoEcommerceContextModelSnapshot : ModelSnapshot
+    [Migration("20251115143425_reviews")]
+    partial class reviews
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

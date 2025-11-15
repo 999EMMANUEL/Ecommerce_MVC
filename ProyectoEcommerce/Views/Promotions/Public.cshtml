@@ -1,0 +1,61 @@
+﻿@using System.Globalization
+@model IEnumerable<ProyectoEcommerce.Models.Product>
+
+@{
+    ViewData["Title"] = "Productos en promoción";
+    var cr = CultureInfo.GetCultureInfo("en-US");
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Imagen</th>
+            <th>Precio original</th>
+            <th>Precio con promoción</th>
+            <th>Promoción</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            var promo = item.Promotion;
+            decimal precioConPromo = item.Price;
+            if (promo != null && promo.DiscountPercent > 0)
+            {
+                precioConPromo = item.Price - (item.Price * promo.DiscountPercent / 100m);
+            }
+
+            <tr>
+                <td>@item.Name</td>
+
+                <td>
+                    <img src="@Url.Content(item.ImageUrl ?? "~/images/no-image.png")"
+                         alt="@item.Name"
+                         style="max-height:60px; object-fit:cover;" />
+                </td>
+
+                <td>
+                    ₡@item.Price.ToString("N0", cr)
+                </td>
+
+                <td>
+                    ₡@precioConPromo.ToString("N0", cr)
+                </td>
+
+                <td>
+                    @if (promo != null && promo.DiscountPercent > 0)
+                    {
+                        @($"{promo.DiscountPercent}% OFF")
+                    }
+                    else
+                    {
+                        <span class="text-muted">Sin promoción</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

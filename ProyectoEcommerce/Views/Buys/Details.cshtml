@@ -183,6 +183,79 @@
                 </table>
             </div>
 
+            <!-- BLOQUE DE RESEÑAS POR PRODUCTO -->
+            <div class="mb-4">
+                <h5>Reseñas de tus productos</h5>
+
+                @if (TempData["ReviewError"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["ReviewError"]</div>
+                }
+                @if (TempData["ReviewSuccess"] != null)
+                {
+                    <div class="alert alert-success">@TempData["ReviewSuccess"]</div>
+                }
+
+                @if (User.Identity.IsAuthenticated)
+                {
+                    @foreach (var it in items)
+                    {
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <h6 class="card-title mb-1">@it.Product?.Name</h6>
+                                <p class="small text-muted mb-2">
+                                    Cantidad: @it.Quantity · Precio unitario: ₡@it.UnitPrice.ToString("N0", nf)
+                                </p>
+
+                                <form asp-controller="Reviews"
+                                      asp-action="CreateFromBuy"
+                                      method="post"
+                                      class="row g-2">
+                                    <input type="hidden" name="buyId" value="@Model.BuyId" />
+                                    <input type="hidden" name="productId" value="@it.ProductId" />
+
+                                    <div class="col-md-2">
+                                        <label class="form-label mb-1 small">Calificación</label>
+                                        <select name="rating" class="form-select form-select-sm" required>
+                                            <option value="">★</option>
+                                            <option value="1">1 ★</option>
+                                            <option value="2">2 ★</option>
+                                            <option value="3">3 ★</option>
+                                            <option value="4">4 ★</option>
+                                            <option value="5">5 ★</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-7">
+                                        <label class="form-label mb-1 small">Comentario</label>
+                                        <textarea name="comment"
+                                          class="form-control form-control-sm"
+                                          rows="2"
+                                          required
+                                          placeholder="Escribe tu reseña sobre este producto...">
+                                        </textarea>
+                                    </div>
+
+                                    <div class="col-md-3 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-sm btn-primary w-100">
+                                            Enviar reseña
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">
+                        <a asp-area="Identity" asp-page="/Account/Login">Inicia sesión</a> para dejar reseñas de tu compra.
+                    </p>
+                }
+            </div>
+
+
+
             <div class="row justify-content-end">
                 <div class="col-md-4">
                     <dl class="row">

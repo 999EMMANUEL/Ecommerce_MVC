@@ -80,6 +80,29 @@ namespace ProyectoEcommerce.Controllers
         }
 
 
+
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> Public()
+        {
+            var productosConPromocion = await _context.Products
+                .Include(p => p.Promotion)                     
+                .Where(p => p.PromotionId != null
+                            && p.Promotion.IsActive
+                            && p.Promotion.EndDate >= DateTime.UtcNow)
+                .OrderBy(p => p.Name)
+                .ToListAsync();
+
+            return View(productosConPromocion);
+        }
+
+
+
+
+
+
+
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
