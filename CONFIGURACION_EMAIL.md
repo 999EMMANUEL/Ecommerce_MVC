@@ -4,7 +4,38 @@
 
 ### Última actualización: 2025-11-15
 
-### 1. ✅ Validación Mejorada de Datos Antes del Envío
+### 1. ✅ **CRÍTICO**: Vista InvoiceTemplate No Encontrada (Actualización 2025-11-15)
+**Problema:** El ViewEngine no podía encontrar la vista `InvoiceTemplate.cshtml` aunque existía.
+
+**Error reportado:**
+```
+Value cannot be null. (Parameter 'No se encontró la vista InvoiceTemplate')
+```
+
+**Causa:** Los métodos `FindView()` en `EmailService.cs` y `PdfService.cs` no funcionan correctamente cuando se usa un `DefaultHttpContext` creado manualmente (fuera del contexto de una petición HTTP real).
+
+**Solución:** Cambiar de `FindView()` a `GetView()` en ambos servicios:
+```csharp
+// ANTES (No funcionaba):
+var viewResult = _viewEngine.FindView(actionContext, $"~/Views/Emails/{viewName}.cshtml", false);
+
+// AHORA (Funciona correctamente):
+var viewPath = $"~/Views/Emails/{viewName}.cshtml";
+var viewResult = _viewEngine.GetView(executingFilePath: null, viewPath: viewPath, isMainPage: true);
+
+if (!viewResult.Success)
+{
+    var searchedLocations = string.Join(Environment.NewLine, viewResult.SearchedLocations);
+    throw new FileNotFoundException($"No se encontró la vista {viewName}. Ubicaciones buscadas: {searchedLocations}");
+}
+```
+
+**Por qué GetView es mejor:**
+- `GetView()` es más apropiado para contextos creados manualmente
+- `FindView()` está diseñado para buscar vistas dentro del contexto de una petición HTTP normal
+- `GetView()` usa rutas absolutas y funciona mejor con `DefaultHttpContext`
+
+### 2. ✅ Validación Mejorada de Datos Antes del Envío
 **Problema:** El método `SendInvoiceEmailAsync` podía recibir objetos `Buy` sin las relaciones necesarias (`Items`, `Customer`) cargadas, causando errores al renderizar la vista.
 
 **Solución:** Agregadas validaciones exhaustivas que verifican:
@@ -25,13 +56,14 @@
 - Proceso de envío SMTP
 - Errores específicos con detalles completos
 
-### 3. ✅ Mensajes de Error Visibles al Usuario
+### 3. ✅ Mensajes de Error Visibles al Usuario (Actualización previa)
 **Problema:** Los errores del email se capturaban pero el usuario no veía los detalles.
 
 **Solución:**
 - Los errores ahora se muestran en `TempData["Warning"]` con el detalle completo
 - Incluye tanto el error principal como `InnerException` si existe
 - El usuario puede ver exactamente qué salió mal
+- Vista `Buys/Details.cshtml` actualizada para mostrar alertas de Warning y Error
 
 ### 4. ✅ Error Crítico en EmailService.cs (Corregido Previamente)
 **Problema:** El `MemoryStream` del PDF se estaba disponiendo antes de que el email se enviara, causando que el attachment no pudiera leer los datos.
@@ -313,32 +345,49 @@ Si usas Gmail Workspace (G Suite), puedes necesitar configuración adicional:
 
 ## Archivos Modificados
 
-### Actualización 2025-11-15:
+### 🔥 Última Corrección Crítica (2025-11-15):
+
+**EmailService.cs y PdfService.cs** - Corrección de búsqueda de vista
+- ✅ **CRÍTICO:** Cambiado `FindView()` por `GetView()` en método `RenderViewToStringAsync()`
+- ✅ Mejorados mensajes de error para mostrar ubicaciones buscadas
+- ✅ Cambiado `ArgumentNullException` por `FileNotFoundException`
+- ✅ Esto resuelve el error: "No se encontró la vista InvoiceTemplate"
+
+### Actualización 2025-11-15 (Mejoras previas):
 
 1. **EmailService.cs** (ProyectoEcommerce/Services/)
-   - ✅ **NUEVO:** Validación exhaustiva de parámetros de entrada (`buy`, `recipientEmail`)
-   - ✅ **NUEVO:** Validación de relaciones cargadas (`Items`, `Customer`)
-   - ✅ **NUEVO:** Logging de configuración SMTP al iniciar envío
+   - ✅ Validación exhaustiva de parámetros de entrada (`buy`, `recipientEmail`)
+   - ✅ Validación de relaciones cargadas (`Items`, `Customer`)
+   - ✅ Logging de configuración SMTP al iniciar envío
    - ✅ Corregido manejo de MemoryStream para attachments (previo)
    - ✅ Agregado logging detallado en múltiples puntos
    - ✅ Agregado timeout SMTP de 30 segundos
    - ✅ Validación de configuración mejorada
    - ✅ Mejor manejo de excepciones con mensajes descriptivos
 
-2. **ShoppingCartsController.cs** (ProyectoEcommerce/Controllers/)
-   - ✅ **NUEVO:** Validaciones previas antes de llamar `SendInvoiceEmailAsync`
-   - ✅ **NUEVO:** Verificación de que `Items` y `Customer` estén cargados
-   - ✅ **NUEVO:** Logging adicional antes y después del envío de email
-   - ✅ **NUEVO:** Manejo de errores mejorado con `TempData["Warning"]` que muestra el error completo
-   - ✅ **NUEVO:** Inclusión de `InnerException` en mensajes de error para mejor debugging
+2. **PdfService.cs** (ProyectoEcommerce/Services/)
+   - ✅ **NUEVO:** Cambio de `FindView()` a `GetView()` para compatibilidad
 
-3. **CONFIGURACION_EMAIL.md** (Raíz del proyecto)
-   - ✅ **NUEVO:** Documentación actualizada con los nuevos cambios
+3. **ShoppingCartsController.cs** (ProyectoEcommerce/Controllers/)
+   - ✅ Validaciones previas antes de llamar `SendInvoiceEmailAsync`
+   - ✅ Verificación de que `Items` y `Customer` estén cargados
+   - ✅ Logging adicional antes y después del envío de email
+   - ✅ Manejo de errores mejorado con `TempData["Warning"]` que muestra el error completo
+   - ✅ Inclusión de `InnerException` en mensajes de error para mejor debugging
+
+4. **Views/Buys/Details.cshtml**
+   - ✅ Agregado soporte para mostrar `TempData["Warning"]` con estilo amarillo
+   - ✅ Agregado soporte para mostrar `TempData["Error"]` con estilo rojo
+   - ✅ Mejora en visualización de mensajes de éxito
+
+5. **CONFIGURACION_EMAIL.md** (Raíz del proyecto)
+   - ✅ Documentación actualizada con todos los cambios
    - ✅ Instrucciones detalladas para configuración de Gmail
    - ✅ Checklist de verificación completo
    - ✅ Solución de problemas comunes
+   - ✅ Documentación del problema de vista y su solución
 
-4. **appsettings.json**
+6. **appsettings.json**
    - ⚠️ **ACCIÓN REQUERIDA:** Actualiza la contraseña de aplicación si no funciona
 
 ---

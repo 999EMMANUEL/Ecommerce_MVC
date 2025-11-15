@@ -60,11 +60,13 @@ namespace ProyectoEcommerce.Services
 
             using (var sw = new StringWriter())
             {
-                var viewResult = _viewEngine.FindView(actionContext, $"~/Views/Emails/{viewName}.cshtml", false);
+                var viewPath = $"~/Views/Emails/{viewName}.cshtml";
+                var viewResult = _viewEngine.GetView(executingFilePath: null, viewPath: viewPath, isMainPage: true);
 
-                if (viewResult.View == null)
+                if (!viewResult.Success)
                 {
-                    throw new ArgumentNullException($"No se encontró la vista {viewName}");
+                    var searchedLocations = string.Join(Environment.NewLine, viewResult.SearchedLocations ?? new string[0]);
+                    throw new FileNotFoundException($"No se encontró la vista {viewName}. Ubicaciones buscadas: {searchedLocations}");
                 }
 
                 var viewDictionary = new ViewDataDictionary(new Microsoft.AspNetCore.Mvc.ModelBinding.EmptyModelMetadataProvider(), new Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary())
