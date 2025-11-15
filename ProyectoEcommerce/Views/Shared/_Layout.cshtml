@@ -44,8 +44,50 @@
                 @await Component.InvokeAsync("CartTodo")
 
                 <button id="btnAccessibility" class="header-btn btn btn-outline-secondary btn-sm"
-                        style="min-width:60px; height:36px;">
+                        style="min-width:60px; height:36px;" aria-label="Opciones de accesibilidad" aria-expanded="false">
                     <i class="fas fa-universal-access" style="font-size: 1.3rem;"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Panel de Accesibilidad -->
+        <div id="accessibilityPanel" class="accessibility-panel" role="dialog" aria-label="Panel de accesibilidad">
+            <div class="option-group">
+                <h4>Tamaño de Fuente</h4>
+                <div class="btn-group" role="group" aria-label="Tamaño de fuente">
+                    <button type="button" class="font-size-btn" id="font-small">
+                        <i class="fas fa-font" style="font-size: 0.8rem;"></i> Pequeña
+                    </button>
+                    <button type="button" class="font-size-btn active" id="font-normal">
+                        <i class="fas fa-font" style="font-size: 1rem;"></i> Normal
+                    </button>
+                    <button type="button" class="font-size-btn" id="font-large">
+                        <i class="fas fa-font" style="font-size: 1.2rem;"></i> Grande
+                    </button>
+                    <button type="button" class="font-size-btn" id="font-xlarge">
+                        <i class="fas fa-font" style="font-size: 1.4rem;"></i> Muy Grande
+                    </button>
+                </div>
+            </div>
+
+            <div class="option-group">
+                <h4>Contraste</h4>
+                <div class="btn-group" role="group" aria-label="Nivel de contraste">
+                    <button type="button" class="contrast-btn active" id="contrast-normal">
+                        <i class="fas fa-adjust"></i> Normal
+                    </button>
+                    <button type="button" class="contrast-btn" id="contrast-high">
+                        <i class="fas fa-circle-half-stroke"></i> Alto
+                    </button>
+                    <button type="button" class="contrast-btn" id="contrast-inverted">
+                        <i class="fas fa-circle"></i> Invertido
+                    </button>
+                </div>
+            </div>
+
+            <div class="option-group">
+                <button type="button" id="reset-accessibility">
+                    <i class="fas fa-undo"></i> Restablecer
                 </button>
             </div>
         </div>
