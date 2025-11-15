@@ -561,3 +561,51 @@
     font-weight: 600;
     color: #0b6b4a;
 }
+
+
+/* Carrusel y botones*/
+.carousel-wrapper {
+    position: relative;
+}
+
+.carousel-controls-overlay {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+    .carousel-controls-overlay button {
+        pointer-events: auto;
+       
+        border: none;
+        font-size: 1.8rem;
+        color: #333;
+        padding: 12px;
+        
+        cursor: pointer;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2); /* sombra inicial */
+        transition: all 0.2s ease-in-out;
+    }
+
+        /* Hover: efecto elegante */
+        .carousel-controls-overlay button:hover {
+            background: #f0f0f0;
+            transform: scale(1.1);
+        }
+
+        /* Active: sombra interna al presionar */
+        .carousel-controls-overlay button:active {
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.3);
+            transform: scale(0.95);
+        }
+
+
+
+    
+

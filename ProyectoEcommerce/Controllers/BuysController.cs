@@ -1,4 +1,6 @@
 ﻿
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,7 +34,6 @@ namespace ProyectoEcommerce.Controllers
         }
 
         // ========= USUARIO: Mis compras (por email) =========
-        // Asumimos que Customer.Email coincide con el correo con el que el usuario inició sesión (Identity)
         public async Task<IActionResult> My()
         {
             var email = User?.Identity?.Name; // Identity usa normalmente el email como Name
@@ -56,6 +57,7 @@ namespace ProyectoEcommerce.Controllers
             var buy = await _context.Buys
                 .Include(b => b.Customer)
                 .Include(b => b.Employee)
+                .Include(b => b.Items).ThenInclude(i => i.Product) // incluir items y productos para la factura
                 .FirstOrDefaultAsync(m => m.BuyId == id);
 
             if (buy == null) return NotFound();
@@ -162,4 +164,3 @@ namespace ProyectoEcommerce.Controllers
         private bool BuyExists(int id) => _context.Buys.Any(e => e.BuyId == id);
     }
 }
-

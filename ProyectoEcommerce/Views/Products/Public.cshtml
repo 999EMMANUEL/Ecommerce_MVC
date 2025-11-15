@@ -4,16 +4,19 @@
     ViewData["Title"] = "Catálogo";
     var categories = ViewBag.Categories as List<SelectListItem>;
 
-   
-    var q = Context.Request.Query["q"].ToString();
+    // leer 'searchTerm' (coherente con los formularios)
+    var q = Context.Request.Query["searchTerm"].ToString();
     var selectedCat = Context.Request.Query["categoryId"].ToString();
+    var topViewed = ViewBag.TopViewed as List<ProyectoEcommerce.Models.Product>;
 }
+
+
 
 <h1 class="mb-3">@ViewData["Title"]</h1>
 
 <form method="get" class="row g-2 mb-4">
     <div class="col-12 col-sm-6">
-        <input name="q" class="form-control" placeholder="Buscar productos..." value="@q" />
+        <input name="searchTerm" class="form-control" placeholder="Buscar productos..." value="@q" />
     </div>
     <div class="col-12 col-sm-4">
         <select name="categoryId" class="form-select">
@@ -31,6 +34,8 @@
         <button class="btn btn-primary w-100">Filtrar</button>
     </div>
 </form>
+
+
 
 @if (!(Model?.Any() ?? false))
 {

@@ -1,0 +1,163 @@
+﻿@model List<ProyectoEcommerce.Models.Product>
+@{
+    ViewData["Title"] = "Mis Favoritos";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">
+                    <i class="fas fa-heart text-danger me-2"></i>Mis Productos Favoritos
+                </h1>
+                <div>
+                    <span class="badge bg-danger fs-6">@(Model?.Count ?? 0) productos</span>
+                </div>
+            </div>
+
+            @if (ViewBag.Error != null)
+            {
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>@ViewBag.Error
+                </div>
+            }
+
+            @if (Model == null || !Model.Any())
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-heart fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No tienes productos favoritos</h4>
+                    <p class="text-muted">Agrega productos a favoritos para verlos aquí</p>
+                    <a href="/" class="btn btn-primary mt-3">
+                        <i class="fas fa-shopping-bag me-2"></i>Explorar Productos
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="row">
+                    @foreach (var product in Model)
+                    {
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 product-card shadow-sm">
+                                <!-- IMAGEN DEL PRODUCTO -->
+                                <div class="position-relative">
+                                    <img src="@(product.ImageUrl?.Replace("~/", "/") ?? "/images/no-image.png")"
+                                         class="card-img-top"
+                                         alt="@product.Name"
+                                         style="height: 200px; object-fit: cover;"
+                                         onerror="this.src='/images/no-image.png'">
+
+                                    <!-- Botón de Quitar Favorito -->
+                                    <div class="position-absolute top-0 end-0 p-2">
+                                        <button class="btn btn-sm btn-outline-danger favorite-btn"
+                                                data-product-id="@product.Id"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                title="Quitar de favoritos">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">@product.Name</h5>
+
+                                    <p class="card-text text-muted small flex-grow-1">
+                                        @if (string.IsNullOrEmpty(product.Description))
+                                        {
+                                            <span class="text-muted">Sin descripción disponible</span>
+                                        }
+                                        else
+                                        {
+                                            @(product.Description.Length > 100 ?
+                                                                            product.Description.Substring(0, 100) + "..." :
+                                                                            product.Description)
+                                                                }
+                                    </p>
+
+                                    <span class="h5 text-primary">₡@product.Price.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</span>
+
+                                    @if (!product.Available || product.Stock <= 0)
+                                    {
+                                        <div class="mb-2">
+                                            <span class="badge bg-warning">No disponible</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="mb-2">
+                                            <span class="badge bg-success">En stock</span>
+                                            <small class="text-muted">(@product.Stock disponibles)</small>
+                                        </div>
+                                    }
+
+                                    <!-- Botones Dentro de la lista de Favoritos -->
+
+                                    <div class="d-grid gap-2 mt-auto">
+                                        <a href="/Products/DetailsPublic/@product.Id"
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-1"></i>Ver Detalles
+                                        </a>
+
+
+                                        @if (product.Available && product.Stock > 0)
+                                        {
+                                            <form asp-controller="ShoppingCarts" asp-action="AddToCart"
+                                                  method="post" class="add-to-cart-form m-0">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="productId" value="@product.Id" />
+                                                <input type="hidden" name="quantity" value="1" />
+                                                <input type="hidden" name="returnUrl"
+                                                       value="@Url.Action("Index", "Favorites")" />
+
+                                                <button type="submit" class="btn btn-primary btn-sm w-100 add-to-cart-btn">
+                                                    <span class="button-text">
+                                                        <i class="fas fa-cart-plus me-1"></i>Agregar al Carrito
+                                                    </span>
+                                                    <span class="spinner-border spinner-border-sm d-none" role="status">
+                                                        <span class="visually-hidden">Cargando...</span>
+                                                    </span>
+                                                </button>
+                                            </form>
+                                        }
+
+                                     
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // JavaScript para quitar favoritos
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.favorite-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    const productId = this.getAttribute('data-product-id');
+
+                    const response = await fetch('/Favorites/ToggleFavorite', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(parseInt(productId))
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        // Recargar la página para ver los cambios
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 500);
+                    }
+                });
+            });
+        });
+    </script>
+}

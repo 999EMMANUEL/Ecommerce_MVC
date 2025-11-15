@@ -1,177 +1,162 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.Json;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ProyectoEcommerce.Data;
 using ProyectoEcommerce.Models;
+using ProyectoEcommerce.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace ProyectoEcommerce.Controllers
 {
-    [Authorize] // requiere login por defecto
+    [Authorize]
     public class ShoppingCartsController : Controller
     {
         private readonly ProyectoEcommerceContext _context;
+        private readonly ICartService _cartService;
+        private readonly ILogger<ShoppingCartsController> _logger;
+        private const decimal IVA_RATE = 0.13m;
 
-        public ShoppingCartsController(ProyectoEcommerceContext context)
+        public ShoppingCartsController(ProyectoEcommerceContext context, ICartService cartService, ILogger<ShoppingCartsController> logger)
         {
             _context = context;
+            _cartService = cartService;
+            _logger = logger;
         }
 
-        // ========= ADMIN: listado global =========
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Index()
-        {
-            var query = _context.ShoppingCarts
-                .Include(s => s.Customer)
-                .OrderByDescending(s => s.CreatedDate);
-            return View(await query.ToListAsync());
-        }
-
-        // ========= Mi carrito (usuario autenticado) =========
+        // ========= MI CARRITO =========
         public async Task<IActionResult> My()
         {
             var email = User?.Identity?.Name;
             if (string.IsNullOrWhiteSpace(email)) return Challenge();
 
-            var customer = await _context.Customers.FirstOrDefaultAsync(c => c.Email == email);
-            if (customer == null)
-            {
-                // No hay Customer para este usuario: decide qué hacer (perfil, etc.)
-                // Redirigimos a Customers/My para que complete su perfil (ajústalo si quieres otro flujo)
-                return RedirectToAction("My", "Customers");
-            }
+            var cart = await _cartService.GetCartByEmailAsync(email);
+            if (cart == null) return View(null);
 
-            var cart = await _context.ShoppingCarts
-                .Include(s => s.Customer)
-                // .Include(s => s.Items).ThenInclude(i => i.Product)   // ← descomenta si tienes Items
-                .FirstOrDefaultAsync(s => s.CustomerId == customer.CustomerId);
+            // CUPONES VISIBLES PARA EL CLIENTE
+            ViewBag.ActiveCoupons = await _context.Coupons
+                .Where(c => c.IsActive && DateTime.Today >= c.ValidFrom && DateTime.Today <= c.ValidTo)
+                .OrderBy(c => c.ValidTo)
+                .ToListAsync();
 
-            if (cart == null)
+            // CALCULAR PREVISUALIZACIÓN DEL DESCUENTO
+            decimal discount = 0m;
+            string couponCode = HttpContext.Session.GetString("CurrentCouponCode");
+
+            if (!string.IsNullOrWhiteSpace(couponCode))
             {
-                cart = new ShoppingCart
+                var coupon = await _context.Coupons.FirstOrDefaultAsync(c => c.Code == couponCode && c.IsActive);
+
+                if (coupon != null)
                 {
-                    CustomerId = customer.CustomerId,
-                    CreatedDate = DateTime.UtcNow
-                };
-                _context.ShoppingCarts.Add(cart);
-                await _context.SaveChangesAsync();
-            }
+                    var today = DateTime.Today;
+                    if (today >= coupon.ValidFrom.Date && today <= coupon.ValidTo.Date)
+                    {
+                        var subtotal = cart.Items.Sum(i => i.Quantity * (i.Product?.Price ?? 0m));
+                        discount = subtotal * (coupon.DiscountPercent / 100m);
+                        if (discount > subtotal) discount = subtotal;
 
-            return View(cart); // Views/ShoppingCarts/My.cshtml
-        }
-
-        // ========= Details: Admin ve todo; dueño puede ver el suyo =========
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var cart = await _context.ShoppingCarts
-                .Include(s => s.Customer)
-                // .Include(s => s.Items).ThenInclude(i => i.Product)   // ← si tienes Items
-                .FirstOrDefaultAsync(m => m.ShoppingCartId == id);
-            if (cart == null) return NotFound();
-
-            if (!User.IsInRole("Admin"))
-            {
-                var email = User?.Identity?.Name;
-                if (string.IsNullOrWhiteSpace(email) ||
-                    !string.Equals(cart.Customer?.Email, email, StringComparison.OrdinalIgnoreCase))
-                {
-                    return Forbid();
+                        ViewBag.CouponCode = coupon.Code;
+                    }
+                    else
+                        HttpContext.Session.Remove("CurrentCouponCode");
                 }
+                else
+                    HttpContext.Session.Remove("CurrentCouponCode");
             }
 
+            ViewBag.CouponDiscount = discount;
             return View(cart);
         }
 
-        // ========= CRUD ADMIN =========
-        [Authorize(Roles = "Admin")]
-        public IActionResult Create()
+        // APLICAR CUPÓN
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ApplyCoupon(string code)
         {
-            ViewData["CustomerId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Customers, "CustomerId", "Email");
-            return View();
-        }
+            var email = User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(email)) return Challenge();
 
-        [HttpPost, ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create([Bind("ShoppingCartId,CreatedDate,CustomerId")] ShoppingCart shoppingCart)
-        {
-            if (!ModelState.IsValid)
+            if (string.IsNullOrWhiteSpace(code))
             {
-                ViewData["CustomerId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Customers, "CustomerId", "Email", shoppingCart.CustomerId);
-                return View(shoppingCart);
+                TempData["Error"] = "Debe ingresar un código de cupón.";
+                return RedirectToAction("My");
             }
 
-            _context.Add(shoppingCart);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+            code = code.Trim().ToUpper();
+            var cart = await _cartService.GetCartByEmailAsync(email);
 
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var shoppingCart = await _context.ShoppingCarts.FindAsync(id);
-            if (shoppingCart == null) return NotFound();
-
-            ViewData["CustomerId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Customers, "CustomerId", "Email", shoppingCart.CustomerId);
-            return View(shoppingCart);
-        }
-
-        [HttpPost, ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, [Bind("ShoppingCartId,CreatedDate,CustomerId")] ShoppingCart shoppingCart)
-        {
-            if (id != shoppingCart.ShoppingCartId) return NotFound();
-            if (!ModelState.IsValid)
+            if (cart == null || !cart.Items.Any())
             {
-                ViewData["CustomerId"] = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(_context.Customers, "CustomerId", "Email", shoppingCart.CustomerId);
-                return View(shoppingCart);
+                TempData["Error"] = "No hay productos en el carrito.";
+                return RedirectToAction("My");
             }
+
+            var coupon = await _context.Coupons.FirstOrDefaultAsync(c => c.Code == code && c.IsActive);
+            if (coupon == null)
+            {
+                TempData["Error"] = "Cupón inválido o inactivo.";
+                return RedirectToAction("My");
+            }
+
+            var today = DateTime.Today;
+            if (today < coupon.ValidFrom.Date || today > coupon.ValidTo.Date)
+            {
+                TempData["Error"] = "El cupón no está vigente.";
+                return RedirectToAction("My");
+            }
+
+            HttpContext.Session.SetString("CurrentCouponCode", coupon.Code);
+            TempData["Success"] = $"Cupón {coupon.Code} aplicado correctamente.";
+            return RedirectToAction("My");
+        }
+
+        // PAGAR (aplica descuento definitivo)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Pay()
+        {
+            var email = User?.Identity?.Name;
+            if (string.IsNullOrWhiteSpace(email)) return Challenge();
 
             try
             {
-                _context.Update(shoppingCart);
-                await _context.SaveChangesAsync();
+                var buy = await _cartService.CreateBuyFromCartAsync(email, IVA_RATE);
+
+                var couponCode = HttpContext.Session.GetString("CurrentCouponCode");
+                if (!string.IsNullOrWhiteSpace(couponCode))
+                {
+                    var coupon = await _context.Coupons.FirstOrDefaultAsync(c => c.Code == couponCode && c.IsActive);
+                    if (coupon != null)
+                    {
+                        var buyFromDb = await _context.Buys.Include(b => b.Items).FirstOrDefaultAsync(b => b.BuyId == buy.BuyId);
+                        var subtotal = buyFromDb.Subtotal;
+                        var discount = subtotal * (coupon.DiscountPercent / 100m);
+                        if (discount > subtotal) discount = subtotal;
+
+                        buyFromDb.CouponCode = coupon.Code;
+                        buyFromDb.DiscountAmount = discount;
+                        buyFromDb.Total = Math.Max(0, buyFromDb.Total - discount);
+
+                        await _context.SaveChangesAsync();
+                    }
+
+                    HttpContext.Session.Remove("CurrentCouponCode");
+                }
+
+                TempData["Success"] = "Pago realizado con éxito.";
+                return RedirectToAction("Details", "Buys", new { id = buy.BuyId });
             }
-            catch (DbUpdateConcurrencyException)
+            catch
             {
-                if (!ShoppingCartExists(shoppingCart.ShoppingCartId)) return NotFound();
-                throw;
+                TempData["Error"] = "Error al procesar el pago.";
+                return RedirectToAction("My");
             }
-            return RedirectToAction(nameof(Index));
         }
-
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var shoppingCart = await _context.ShoppingCarts
-                .Include(s => s.Customer)
-                .FirstOrDefaultAsync(m => m.ShoppingCartId == id);
-            if (shoppingCart == null) return NotFound();
-
-            return View(shoppingCart);
-        }
-
-        [HttpPost, ActionName("Delete"), ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var shoppingCart = await _context.ShoppingCarts.FindAsync(id);
-            if (shoppingCart != null)
-            {
-                _context.ShoppingCarts.Remove(shoppingCart);
-            }
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ShoppingCartExists(int id)
-            => _context.ShoppingCarts.Any(e => e.ShoppingCartId == id);
     }
 }

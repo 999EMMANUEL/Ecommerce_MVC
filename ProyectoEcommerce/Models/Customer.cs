@@ -8,7 +8,7 @@ namespace ProyectoEcommerce.Models
 
         [Display(Name = "Nombre completo")]
         [StringLength(120)]
-        public string? Name_full { get; set; }
+        public string Name_full { get; set; }
 
         [Display(Name = "Correo")]
         [EmailAddress]
@@ -17,11 +17,11 @@ namespace ProyectoEcommerce.Models
 
         [Display(Name = "Teléfono")]
         [StringLength(40)]
-        public string? Telefono { get; set; }
+        public string Telefono { get; set; }
 
         [Display(Name = "Dirección")]
         [StringLength(250)]
-        public string? Direccion { get; set; }
+        public string Direccion { get; set; }
         public virtual ICollection<ShoppingCart> ShoppingCarts { get; set; }
         public virtual ICollection<Buy> Buys { get; set; }
     }

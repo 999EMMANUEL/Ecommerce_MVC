@@ -118,7 +118,7 @@ namespace ProyectoEcommerce.Controllers
         // GET: /Faqs/Public  (visible para todos)
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Public(string? q, string? cat)
+        public async Task<IActionResult> Public(string q, string cat)
         {
             var faqs = _context.Faqs.Where(f => f.IsActive);
 

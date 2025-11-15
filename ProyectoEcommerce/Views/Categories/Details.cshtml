@@ -34,12 +34,11 @@
 </div>
 
 <!-- LINK DIRECTO A PRODUCTOS DE ESA CATEGORÍA -->
-<div class="mb-3">
-    <a asp-controller="Products" asp-action="Index" asp-route-categoryId="@Model.CategoryId"
-       class="btn btn-info">
-        <i class="fas fa-boxes"></i> Ver Productos de esta Categoría
-    </a>
-</div>
+<a asp-controller="Products" asp-action="Public" asp-route-categoryId="@Model.CategoryId"
+   class="btn btn-info">
+    <i class="fas fa-boxes"></i> Ver Productos de esta Categoría
+</a>
+
 
 <div>
     

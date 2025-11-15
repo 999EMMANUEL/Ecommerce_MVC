@@ -3,9 +3,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ProyectoEcommerce.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ProyectoEcommerce.Data
 {
@@ -13,7 +10,9 @@ namespace ProyectoEcommerce.Data
        : IdentityDbContext<IdentityUser, IdentityRole, string>
     {
         public ProyectoEcommerceContext(DbContextOptions<ProyectoEcommerceContext> options)
-            : base(options) { }
+    : base(options)
+        {}
+
 
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
@@ -24,6 +23,12 @@ namespace ProyectoEcommerce.Data
         public DbSet<Buy> Buys { get; set; }
         public DbSet<Faq> Faqs { get; set; }
         public DbSet<BuyItem> BuyItems { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
+
+        public DbSet<Coupon> Coupons { get; set; }
+
+        // Nuevo DbSet para promociones
+        public DbSet<Promotion> Promotions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -89,8 +94,54 @@ namespace ProyectoEcommerce.Data
             // Índice compuesto para Faq (ok)
             modelBuilder.Entity<Faq>()
                 .HasIndex(f => new { f.Category, f.SortOrder });
+
+            // --- FAVORITES: persistencia para usuarios y anónimos ---
+            modelBuilder.Entity<Favorite>(entity =>
+            {
+                entity.HasKey(f => f.FavoriteId);
+
+                // Propiedades
+                entity.Property(f => f.UserId)
+                      .HasMaxLength(450)   // coincide con AspNetUsers PK nvarchar(450)
+                      .IsRequired(false);
+
+                entity.Property(f => f.AnonymousId)
+                      .HasMaxLength(450)
+                      .IsRequired(false);
+
+                // Mapear navegación User -> FK UserId (evita UserId1)
+                entity.HasOne(f => f.User)
+                      .WithMany()
+                      .HasForeignKey(f => f.UserId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                // Mapear relación con Product
+                entity.HasOne(f => f.Product)
+                      .WithMany()
+                      .HasForeignKey(f => f.ProductId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(f => new { f.AnonymousId, f.ProductId }).HasDatabaseName("IX_Favorites_Anon_Product");
+                entity.HasIndex(f => new { f.UserId, f.ProductId }).HasDatabaseName("IX_Favorites_User_Product");
+            });
+
+            // Promotions mapping
+            modelBuilder.Entity<Promotion>(entity =>
+            {
+                entity.HasKey(p => p.PromotionId);
+                entity.Property(p => p.Name).HasMaxLength(100).IsRequired();
+                entity.Property(p => p.BadgeText).HasMaxLength(50);
+                entity.Property(p => p.DiscountPercent).HasPrecision(5, 2);
+                entity.HasIndex(p => new { p.StartDate, p.EndDate });
+            });
+
+            // Product -> Promotion (optional)
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.Promotion)
+                .WithMany(pr => pr.Products)
+                .HasForeignKey(p => p.PromotionId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }
-
 

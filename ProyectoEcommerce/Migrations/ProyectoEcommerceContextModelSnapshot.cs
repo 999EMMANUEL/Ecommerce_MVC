@@ -228,10 +228,16 @@ namespace ProyectoEcommerce.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BuyId"));
 
+                    b.Property<string>("CouponCode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<int>("EmployeeId")
+                    b.Property<decimal>("DiscountAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int?>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Fecha")
@@ -240,6 +246,9 @@ namespace ProyectoEcommerce.Migrations
                     b.Property<decimal>("IVA")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("Paid")
+                        .HasColumnType("bit");
 
                     b.Property<decimal>("Subtotal")
                         .HasPrecision(18, 2)
@@ -302,6 +311,40 @@ namespace ProyectoEcommerce.Migrations
                     b.HasKey("CategoryId");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("ProyectoEcommerce.Models.Coupon", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("DiscountPercent")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("ValidFrom")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ValidTo")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Coupons");
                 });
 
             modelBuilder.Entity("ProyectoEcommerce.Models.Customer", b =>
@@ -397,6 +440,41 @@ namespace ProyectoEcommerce.Migrations
                     b.ToTable("Faqs");
                 });
 
+            modelBuilder.Entity("ProyectoEcommerce.Models.Favorite", b =>
+                {
+                    b.Property<int>("FavoriteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FavoriteId"));
+
+                    b.Property<string>("AnonymousId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("FavoriteId");
+
+                    b.HasIndex("ProductId");
+
+                    b.HasIndex("AnonymousId", "ProductId")
+                        .HasDatabaseName("IX_Favorites_Anon_Product");
+
+                    b.HasIndex("UserId", "ProductId")
+                        .HasDatabaseName("IX_Favorites_User_Product");
+
+                    b.ToTable("Favorites");
+                });
+
             modelBuilder.Entity("ProyectoEcommerce.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -411,11 +489,17 @@ namespace ProyectoEcommerce.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsFeatured")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -425,14 +509,59 @@ namespace ProyectoEcommerce.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("PromotionId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Stock")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ViewCount")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
+                    b.HasIndex("PromotionId");
+
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("ProyectoEcommerce.Models.Promotion", b =>
+                {
+                    b.Property<int>("PromotionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PromotionId"));
+
+                    b.Property<string>("BadgeText")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<decimal>("DiscountPercent")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("PromotionId");
+
+                    b.HasIndex("StartDate", "EndDate");
+
+                    b.ToTable("Promotions");
                 });
 
             modelBuilder.Entity("ProyectoEcommerce.Models.ShoppingCart", b =>
@@ -538,9 +667,7 @@ namespace ProyectoEcommerce.Migrations
 
                     b.HasOne("ProyectoEcommerce.Models.Employee", "Employee")
                         .WithMany("BuysHandled")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("EmployeeId");
 
                     b.Navigation("Customer");
 
@@ -566,6 +693,24 @@ namespace ProyectoEcommerce.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("ProyectoEcommerce.Models.Favorite", b =>
+                {
+                    b.HasOne("ProyectoEcommerce.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Product");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ProyectoEcommerce.Models.Product", b =>
                 {
                     b.HasOne("ProyectoEcommerce.Models.Category", "Category")
@@ -574,7 +719,14 @@ namespace ProyectoEcommerce.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ProyectoEcommerce.Models.Promotion", "Promotion")
+                        .WithMany("Products")
+                        .HasForeignKey("PromotionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Category");
+
+                    b.Navigation("Promotion");
                 });
 
             modelBuilder.Entity("ProyectoEcommerce.Models.ShoppingCart", b =>
@@ -634,6 +786,11 @@ namespace ProyectoEcommerce.Migrations
                     b.Navigation("BuyItems");
 
                     b.Navigation("ShoppingCartItems");
+                });
+
+            modelBuilder.Entity("ProyectoEcommerce.Models.Promotion", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ProyectoEcommerce.Models.ShoppingCart", b =>

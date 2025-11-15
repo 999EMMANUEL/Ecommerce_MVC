@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ProyectoEcommerce.Data;
+using ProyectoEcommerce.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//CONFIGURACIÓN DE LA BASE DE DATOS
 builder.Services.AddDbContext<ProyectoEcommerceContext>(opciones =>
     opciones.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -16,53 +16,79 @@ builder.Services.AddDbContext<ProyectoEcommerceContext>(opciones =>
                 errorNumbersToAdd: null);
         }));
 
-//  CONFIGURACIÓN DE IDENTITY CON ROLES 
+// CONFIGURACIï¿½N DE IDENTITY CON ROLES 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
-    // Configuración de cuenta
-    options.SignIn.RequireConfirmedAccount = false; // Cambiar a true en producción
-
-    // Configuración de contraseña
+    options.SignIn.RequireConfirmedAccount = false;
     options.Password.RequireDigit = true;
     options.Password.RequireLowercase = true;
     options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = false;
     options.Password.RequiredLength = 6;
 
-    // Configuración de bloqueo
+    // Configuraciï¿½n de bloqueo
     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
     options.Lockout.MaxFailedAccessAttempts = 5;
     options.Lockout.AllowedForNewUsers = true;
 
-    // Configuración de usuario
+    // Configuraciï¿½n de usuario
     options.User.RequireUniqueEmail = true;
 })
 .AddEntityFrameworkStores<ProyectoEcommerceContext>()
 .AddDefaultTokenProviders()
 .AddDefaultUI();
 
-// SERVICIOS ADICIONALES
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.Cookie.Name = ".ProyectoEcommerce.Session";
+});
+
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-// CONSTRUCCIÓN DE LA APLICACIÓN
+// Registrar servicio del carrito
+builder.Services.AddScoped<ICartService, CartService>();
+
+// CONSTRUCCIï¿½N DE LA APLICACIï¿½N
 var app = builder.Build();
 
-// INICIALIZACIÓN DE BASE DE DATOS Y ROLES
+// INICIALIZACIï¿½N DE BASE DE DATOS Y ROLES
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
     try
     {
-        // 1. Aplicar migraciones pendientes
         var context = services.GetRequiredService<ProyectoEcommerceContext>();
         await context.Database.MigrateAsync();
         Console.WriteLine("Migraciones aplicadas correctamente");
 
-        // 2. Inicializar roles y administrador usando DbInitializer
+        // Obtener managers para inicializar roles/usuario administrador si es necesario
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+
+        // Si tienes un DbInitializer estï¿½tico que requiere IServiceProvider:
         await DbInitializer.Initialize(services);
-        Console.WriteLine("Roles y usuario administrador inicializados");
+        Console.WriteLine("Roles y usuario administrador inicializados por DbInitializer");
+
+        // Ejemplo adicional de garantï¿½a de existencia de rol/admin (opcional)
+        const string ADMIN = "Admin";
+        if (!await roleManager.RoleExistsAsync(ADMIN))
+            await roleManager.CreateAsync(new IdentityRole(ADMIN));
+
+        var adminEmail = "admin@demo.com"; //fin
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
+        if (adminUser == null)
+        {
+            var admin = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
+            var result = await userManager.CreateAsync(admin, "Admin123!");
+            if (result.Succeeded)
+                await userManager.AddToRoleAsync(admin, ADMIN);
+        }
     }
     catch (InvalidOperationException ex) when (ex.Message.Contains("pending changes"))
     {
@@ -72,8 +98,6 @@ using (var scope = app.Services.CreateScope())
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "Error al inicializar la base de datos");
-
-        // Mostrar error en consola para debugging
         Console.WriteLine($"Error: {ex.Message}");
         if (ex.InnerException != null)
         {
@@ -82,9 +106,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// CONFIGURACIÓN DEL PIPELINE HTTP
-
-// Configurar manejo de errores según el entorno
+// CONFIGURACIï¿½N DEL PIPELINE HTTP
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -95,28 +117,22 @@ else
     app.UseHsts();
 }
 
-// Middleware básico
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-//ORDEN CRÍTICO: Authentication debe ir ANTES de Authorization
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// CONFIGURACIÓN DE RUTAS
-
-// Ruta para áreas (Admin)
 app.MapControllerRoute(
     name: "admin",
     pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 
-// Ruta por defecto
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Mapear páginas Razor (Identity)
 app.MapRazorPages();
 
 app.Run();

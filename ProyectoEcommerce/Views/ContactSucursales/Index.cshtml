@@ -1,0 +1,233 @@
+﻿@model string
+
+@{
+    ViewData["Title"] = "Contacto";
+    var branch = Context.Request.Query["branch"].ToString();
+}
+
+<div class="container mt-4">
+  
+
+    @if (!string.IsNullOrEmpty(branch))
+    {
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item active">Sucursal</li>
+            </ol>
+        </nav>
+
+        <!-- Información específica de cada sucursal -->
+        <div class="row">
+            <div class="col-md-8">
+                @if (branch == "central")
+                {
+                    <h2>Sucursal Central - Nicoya</h2>
+
+                    <!-- MAPA para Central -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-map-marked-alt"></i> Ubicación en el mapa</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="map-central" style="height: 300px; background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                                    <p>Cargando mapa...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <p><i class="fas fa-map-marker-alt"></i> <strong>Dirección:</strong> Av. Principal 123, Nicoya, Guanacaste</p>
+                            <p><i class="fas fa-clock"></i> <strong>Horario:</strong> Lun - Vie 8:00 - 17:00</p>
+                            <p><i class="fas fa-phone"></i> <strong>Teléfono:</strong> <a href="tel:+50612345678">+506 1234-5678</a></p>
+                            <p><i class="fas fa-credit-card"></i> <strong>Métodos de pago:</strong> Tarjeta • Efectivo • PayPal</p>
+                            <p><i class="fas fa-car"></i> <strong>Estacionamiento:</strong> Gratuito</p>
+                        </div>
+                    </div>
+                }
+                else if (branch == "oeste")
+                {
+                    <h2>Sucursal Plaza Oeste</h2>
+
+                    <!-- MAPA para Plaza Oeste -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-map-marked-alt"></i> Ubicación en el mapa</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="map-oeste" style="height: 300px; background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                                    <p>Cargando mapa...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <p><i class="fas fa-map-marker-alt"></i> <strong>Dirección:</strong> Centro Comercial Plaza Oeste, Local 5</p>
+                            <p><i class="fas fa-clock"></i> <strong>Horario:</strong> Lun - Sab 9:00 - 18:00</p>
+                            <p><i class="fas fa-phone"></i> <strong>Teléfono:</strong> <a href="tel:+50687654321">+506 8765-4321</a></p>
+                            <p><i class="fas fa-credit-card"></i> <strong>Métodos de pago:</strong> Tarjeta • PayPal</p>
+                            <p><i class="fas fa-car"></i> <strong>Estacionamiento:</strong> Gratuito</p>
+                        </div>
+                    </div>
+                }
+                else if (branch == "playa")
+                {
+                    <h2>Punto Express - Playa</h2>
+
+                    <!-- MAPA para Playa -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-map-marked-alt"></i> Ubicación en el mapa</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="map-playa" style="height: 300px; background: #f8f9fa; display: flex; align-items: center; justify-content: center;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-spinner fa-spin fa-2x mb-2"></i>
+                                    <p>Cargando mapa...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-body">
+                            <p><i class="fas fa-map-marker-alt"></i> <strong>Dirección:</strong> Ruta 21, Km 4, Local frente a la playa</p>
+                            <p><i class="fas fa-clock"></i> <strong>Horario:</strong> Mar - Dom 10:00 - 20:00</p>
+                            <p><i class="fas fa-phone"></i> <strong>Teléfono:</strong> <a href="tel:+50644556677">+506 4455-6677</a></p>
+                            <p><i class="fas fa-credit-card"></i> <strong>Métodos de pago:</strong> Efectivo • Contra entrega</p>
+                            <p><i class="fas fa-car"></i> <strong>Estacionamiento:</strong> Gratuito</p>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5><i class="fas fa-info-circle"></i> ¿Necesitas ayuda?</h5>
+                        <p>Puedes contactarnos directamente:</p>
+                        <a href="tel:+50612345678" class="btn btn-primary w-100 mb-2">
+                            <i class="fas fa-phone"></i> Llamar ahora
+                        </a>
+                        <a href="https://wa.me/50612345678" class="btn btn-success w-100">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <!-- Google Maps API -->
+    <script>
+        // API Key de Google Maps - 
+        const GOOGLE_MAPS_API_KEY = 'PEGAR API_KEY_AQUI';
+
+        function loadGoogleMaps() {
+            // Verificar si ya está cargada la API
+            if (window.google && window.google.maps) {
+                initMaps();
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&callback=initMaps`;
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        }
+
+        function initMaps() {
+            // Coordenadas de cada sucursal
+            const branchCoords = {
+                'central': {
+                    lat: 10.134533,
+                    lng: -85.446590,
+                    name: 'Sucursal Central - Nicoya',
+                    address: 'Av. Principal 123, Nicoya, Guanacaste'
+                },
+                'oeste': {
+                    lat: 10.140000,
+                    lng: -85.450000,
+                    name: 'Sucursal Plaza Oeste',
+                    address: 'Centro Comercial Plaza Oeste, Local 5'
+                },
+                'playa': {
+                    lat: 10.120000,
+                    lng: -85.430000,
+                    name: 'Punto Express - Playa',
+                    address: 'Ruta 21, Km 4, Local frente a la playa'
+                }
+            };
+
+            const currentBranch = '@branch';
+            const coords = branchCoords[currentBranch];
+
+            if (coords && window.google && window.google.maps) {
+                initMap(currentBranch, coords);
+            }
+        }
+
+        function initMap(branchId, coords) {
+            const mapElement = document.getElementById(`map-${branchId}`);
+
+            const map = new google.maps.Map(mapElement, {
+                center: { lat: coords.lat, lng: coords.lng },
+                zoom: 15,
+                mapTypeControl: false,
+                streetViewControl: true,
+                styles: [
+                    {
+                        featureType: "poi.business",
+                        stylers: [{ visibility: "off" }]
+                    },
+                    {
+                        featureType: "transit",
+                        elementType: "labels.icon",
+                        stylers: [{ visibility: "off" }]
+                    }
+                ]
+            });
+
+            const marker = new google.maps.Marker({
+                position: { lat: coords.lat, lng: coords.lng },
+                map: map,
+                title: coords.name,
+                animation: google.maps.Animation.DROP
+            });
+
+            const infoWindow = new google.maps.InfoWindow({
+                content: `
+                    <div class="p-2" style="min-width: 200px;">
+                        <h6 class="mb-1">${coords.name}</h6>
+                        <p class="mb-1 small">${coords.address}</p>
+                        <a href="https://www.google.com/maps/dir/?api=1&destination=${coords.lat},${coords.lng}"
+                           target="_blank" class="btn btn-sm btn-primary mt-1 w-100">
+                            Cómo llegar
+                        </a>
+                    </div>
+                `
+            });
+
+           
+            infoWindow.open(map, marker);
+
+            
+            marker.addListener('click', () => {
+                infoWindow.open(map, marker);
+            });
+        }
+
+        
+        document.addEventListener('DOMContentLoaded', loadGoogleMaps);
+    </script>
+}

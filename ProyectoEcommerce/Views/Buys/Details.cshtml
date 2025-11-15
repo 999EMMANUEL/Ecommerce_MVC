@@ -1,54 +1,159 @@
 ﻿@model ProyectoEcommerce.Models.Buy
+@using System.Globalization
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Factura / Compra";
+    var nf = new CultureInfo("es-CR").NumberFormat;
+    nf.NumberDecimalDigits = 0;
+    var dateFormatted = Model.Fecha.ToString("g");
+    var paid = Model.Paid;
+    decimal subtotal = Model.Subtotal;
+    decimal iva = Model.IVA;
+    decimal total = Model.Total;
+    var discount = Model.DiscountAmount;
+    var couponCode = Model.CouponCode;
+    var items = Model.Items ?? Enumerable.Empty<ProyectoEcommerce.Models.BuyItem>();
 }
 
-<h1>Details</h1>
+<div class="container py-4 invoice-container">
+    @if (TempData["Success"] != null || paid)
+    {
+        <div class="alert alert-success d-flex align-items-center" role="alert">
+            <i class="fas fa-check-circle me-2" style="font-size:1.2rem"></i>
+            <div>
+                <strong>Compra realizada</strong>
+                <div class="small">Tu pago se procesó correctamente. Gracias por tu compra.</div>
+            </div>
+        </div>
+    }
 
-<div>
-    <h4>Buy</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Fecha)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Fecha)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Subtotal)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Subtotal)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IVA)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IVA)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Total)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Total)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Customer)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Customer.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Employee)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Employee.Name)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.BuyId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h4 class="m-0">Factura</h4>
+                    <small class="text-muted">ID: @Model.BuyId</small>
+                </div>
+                <div class="text-end">
+                    <img src="~/images/Logos/FacturaLogo.png" alt="Logo" style="height:48px;" onerror="this.style.display='none'" />
+                    <div class="small text-muted">Fecha: @dateFormatted</div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h6 class="mb-1">Datos del cliente</h6>
+                    <div>@(Model.Customer?.Name_full ?? Model.Customer?.Email)</div>
+                    <div class="small text-muted">@Model.Customer?.Email</div>
+                    @if (!string.IsNullOrEmpty(Model.Customer?.Email))
+                    {
+                        <div class="small text-muted mt-1">@Model.Customer.Name_full</div>
+                    }
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h6 class="mb-1">Resumen</h6>
+                    <div class="small">Items: @items.Count()</div>
+                    <div class="small">
+                        Estado:
+                        @if (paid)
+                        {
+                            <span class="badge bg-success">Pagada</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Pendiente</span>
+                        }
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(couponCode) && discount > 0)
+                    {
+                        <div class="small mt-1">
+                            Cupón:
+                            <span class="badge bg-info text-dark">@couponCode</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="table-responsive mb-3">
+                <table class="table align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width:72px">Imagen</th>
+                            <th>Producto</th>
+                            <th class="text-center" style="width:100px">Cantidad</th>
+                            <th class="text-end" style="width:140px">Precio unitario</th>
+                            <th class="text-end" style="width:140px">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var it in items)
+                        {
+                            <tr>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(it.Product?.ImageUrl))
+                                    {
+                                        <img src="@Url.Content(it.Product.ImageUrl)"
+                                             alt="@it.Product?.Name"
+                                             style="width:64px;height:48px;object-fit:cover;border-radius:4px;"
+                                             onerror="this.src='/images/no-image.png'" />
+                                    }
+                                    else
+                                    {
+                                        <img src="/images/no-image.png"
+                                             alt="Sin imagen"
+                                             style="width:64px;height:48px;object-fit:cover;border-radius:4px;" />
+                                    }
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">@it.Product?.Name</div>
+                                    <div class="small text-muted">@it.Product?.Description</div>
+
+                                    @if (it.Product?.Promotion != null
+                                                                    && it.Product.Promotion.IsActive
+                                                                    && it.Product.Promotion.StartDate <= DateTime.UtcNow
+                                                                    && it.Product.Promotion.EndDate >= DateTime.UtcNow)
+                                    {
+                                        <div class="badge bg-danger mt-1">
+                                            @it.Product.Promotion.BadgeText ??
+                                            $"{it.Product.Promotion.DiscountPercent}% OFF"
+                                        </div>
+                                    }
+                                </td>
+
+                                <td class="text-center">@it.Quantity</td>
+                                <td class="text-end">₡@it.UnitPrice.ToString("N0", nf)</td>
+                                <td class="text-end">₡@it.Subtotal.ToString("N0", nf)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row justify-content-end">
+                <div class="col-md-4">
+                    <dl class="row">
+                        <dt class="col-6">Subtotal</dt>
+                        <dd class="col-6 text-end">₡@subtotal.ToString("N0", nf)</dd>
+
+                        @if (discount > 0 && !string.IsNullOrEmpty(couponCode))
+                        {
+                            <dt class="col-6">Descuento (@couponCode)</dt>
+                            <dd class="col-6 text-end text-success">- ₡@discount.ToString("N0", nf)</dd>
+                        }
+
+                        <dt class="col-6">IVA</dt>
+                        <dd class="col-6 text-end">₡@iva.ToString("N0", nf)</dd>
+
+                        <dt class="col-6 h5">Total</dt>
+                        <dd class="col-6 h5 text-end">₡@total.ToString("N0", nf)</dd>
+                    </dl>
+
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-outline-secondary" asp-controller="Home" asp-action="Index">Volver</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

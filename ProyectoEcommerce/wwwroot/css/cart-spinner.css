@@ -1,0 +1,28 @@
+﻿/* Estilos para el botón de agregar al carrito con spinner */
+.add-to-cart-btn {
+    position: relative;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .add-to-cart-btn .button-text {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .add-to-cart-btn .spinner-border {
+        margin-left: 8px;
+    }
+
+    .add-to-cart-btn:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+/* Asegurar que el input de cantidad se vea bien */
+.add-to-cart-form .input-group {
+    flex-shrink: 0;
+}

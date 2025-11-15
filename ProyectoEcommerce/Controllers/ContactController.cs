@@ -6,10 +6,17 @@ namespace ProyectoEcommerce.Controllers
     public class ContactController : Controller
     {
         // GET: ContactController
+        
+        // GET: ContactController?branch=central
         public ActionResult Index()
         {
+           
+         
+
             return View();
         }
+
+     
 
         // GET: ContactController/Details/5
         public ActionResult Details(int id)

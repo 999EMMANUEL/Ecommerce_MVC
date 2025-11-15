@@ -1,0 +1,145 @@
+﻿@model ProyectoEcommerce.Models.ShoppingCart
+@using System.Linq
+@using System.Globalization
+
+@{
+    var customFormat = new NumberFormatInfo
+    {
+        NumberDecimalDigits = 0,
+        NumberGroupSeparator = ",",
+        NumberDecimalSeparator = "."
+    };
+
+    var subtotal = Model?.Items.Sum(i => i.Quantity * (i.Product?.Price ?? 0m)) ?? 0m;
+    var ivaRate = 0.13m;
+    var iva = Math.Round(subtotal * ivaRate, 2);
+
+    decimal discount = ViewBag.CouponDiscount ?? 0m;
+    string couponCode = ViewBag.CouponCode as string;
+
+    var total = subtotal - discount + iva;
+    if (total < 0) total = 0;
+}
+
+<h2>Mi carrito</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@if (!string.IsNullOrEmpty(couponCode) && discount > 0)
+{
+    <div class="alert alert-success">
+        Cupón <strong>@couponCode</strong> aplicado — Descuento: <strong>₡@discount.ToString("N0", customFormat)</strong>
+    </div>
+}
+
+@if (Model == null || !Model.Items.Any())
+{
+    <div class="alert alert-info">Tu carrito está vacío.</div>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Seguir comprando</a>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Imagen</th>
+                <th>Producto</th>
+                <th>Precio unidad</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>
+                        <img src="@Url.Content(item.Product?.ImageUrl ?? "/images/no-image.png")"
+                             style="height:60px;width:60px;object-fit:cover;" />
+                    </td>
+                    <td>@item.Product?.Name</td>
+                    <td>₡@((item.Product?.Price ?? 0).ToString("N0", customFormat))</td>
+                    <td>
+                        <form asp-controller="ShoppingCarts" asp-action="UpdateQuantity" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="cartId" value="@Model.ShoppingCartId" />
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <input type="number" name="quantity" value="@item.Quantity" min="1" class="form-control d-inline" style="width:90px;" />
+                            <button class="btn btn-outline-primary btn-sm">Actualizar</button>
+                        </form>
+                    </td>
+                    <td>₡@((item.Quantity * (item.Product?.Price ?? 0)).ToString("N0", customFormat))</td>
+                    <td>
+                        <form asp-controller="ShoppingCarts" asp-action="RemoveItem" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="cartId" value="@Model.ShoppingCartId" />
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="text-end">
+        <dl class="row justify-content-end">
+            <dt class="col-4">Subtotal:</dt>
+            <dd class="col-4 text-end">₡@subtotal.ToString("N0", customFormat)</dd>
+
+            @if (discount > 0)
+            {
+                <dt class="col-4 text-success">Descuento (@couponCode):</dt>
+                <dd class="col-4 text-end text-success">-₡@discount.ToString("N0", customFormat)</dd>
+            }
+
+            <dt class="col-4">IVA:</dt>
+            <dd class="col-4 text-end">₡@iva.ToString("N0", customFormat)</dd>
+
+            <dt class="col-4 h5">TOTAL:</dt>
+            <dd class="col-4 h5 text-end">₡@total.ToString("N0", customFormat)</dd>
+        </dl>
+
+        <form asp-controller="ShoppingCarts" asp-action="Pay" method="post">
+            @Html.AntiForgeryToken()
+            <button class="btn btn-success btn-lg">Pagar</button>
+        </form>
+    </div>
+}
+
+<form asp-action="ApplyCoupon" method="post" class="mt-4">
+    @Html.AntiForgeryToken()
+    <div class="input-group">
+        <input type="text" name="code" class="form-control" placeholder="Código de cupón" required />
+        <button class="btn btn-primary">Aplicar cupón</button>
+    </div>
+</form>
+
+@if (ViewBag.ActiveCoupons != null)
+{
+    <h5 class="mt-4">Cupones disponibles</h5>
+    <ul class="list-group">
+        @foreach (var c in ViewBag.ActiveCoupons)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>@c.Code</strong> — @c.Description
+                    <br /><small>Descuento: @c.DiscountPercent% • Válido hasta @c.ValidTo.ToString("dd/MM/yyyy")</small>
+                </div>
+                <form asp-action="ApplyCoupon" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="code" value="@c.Code" />
+                    <button class="btn btn-outline-primary btn-sm">Usar</button>
+                </form>
+            </li>
+        }
+    </ul>
+}

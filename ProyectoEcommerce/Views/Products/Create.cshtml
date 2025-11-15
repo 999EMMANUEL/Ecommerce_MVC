@@ -9,7 +9,7 @@
 <h4>Product</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -32,6 +32,11 @@
                     <input class="form-check-input" asp-for="Available" /> @Html.DisplayNameFor(model => model.Available)
                 </label>
             </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                   <input class="form-check-input" asp-for="IsFeatured" /> @Html.DisplayNameFor(model => model.IsFeatured)
+              </label>
+            </div>
             <div class="form-group">
                 <label asp-for="ImageUrl" class="control-label"></label>
                 <input asp-for="ImageUrl" class="form-control" />
@@ -46,11 +51,34 @@
                 <label asp-for="CategoryId" class="control-label"></label>
                 <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
             </div>
-            <div class="form-group">
+
+            <div class="form-group d-flex gap-2 mt-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
+                <button type="button" id="btnShowImages" class="btn btn-outline-secondary">Imágenes</button>
             </div>
         </form>
     </div>
+</div>
+
+<!-- Modal para mostrar nombres de imágenes -->
+<div class="modal fade" id="imagesModal" tabindex="-1" aria-labelledby="imagesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imagesModalLabel">Imágenes en images/products</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div id="imagesList" class="list-group">
+          <div class="text-muted text-center py-3"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
+        </div>
+        <div id="copyFeedbackContainer" class="mt-2"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div>
@@ -59,4 +87,104 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        (function() {
+            const btn = document.getElementById('btnShowImages');
+            const imagesList = document.getElementById('imagesList');
+            const imagesModalEl = document.getElementById('imagesModal');
+            const imagesModal = new bootstrap.Modal(imagesModalEl);
+            const feedbackContainer = document.getElementById('copyFeedbackContainer');
+
+            btn.addEventListener('click', function() {
+                imagesList.innerHTML = '<div class="text-muted text-center py-3"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>';
+                fetch('@Url.Action("ListProductImages","Products")', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    imagesList.innerHTML = '';
+                    feedbackContainer.innerHTML = '';
+                    if (!data.success) {
+                        imagesList.innerHTML = `<div class="alert alert-warning mb-0">${data.message || 'No hay imágenes'}</div>`;
+                    } else if (data.images && data.images.length > 0) {
+                        data.images.forEach(function(name) {
+                            // crear fila sin innerHTML para evitar problemas de encoding
+                            const item = document.createElement('div');
+                            item.className = 'list-group-item d-flex justify-content-between align-items-center';
+
+                            const nameLink = document.createElement('a');
+                            nameLink.href = '#';
+                            nameLink.className = 'copy-image-name text-decoration-none';
+                            nameLink.dataset.name = name;
+                            nameLink.textContent = name;
+
+                            const controls = document.createElement('div');
+
+                            const viewLink = document.createElement('a');
+                            viewLink.href = '/images/products/' + encodeURIComponent(name);
+                            viewLink.target = '_blank';
+                            viewLink.className = 'btn btn-sm btn-outline-primary me-2';
+                            viewLink.textContent = 'Ver';
+
+                            const copyBtn = document.createElement('button');
+                            copyBtn.type = 'button';
+                            copyBtn.className = 'btn btn-sm btn-outline-secondary copy-btn';
+                            copyBtn.dataset.name = name;
+                            copyBtn.textContent = 'Copiar';
+
+                            controls.appendChild(viewLink);
+                            controls.appendChild(copyBtn);
+
+                            item.appendChild(nameLink);
+                            item.appendChild(controls);
+
+                            imagesList.appendChild(item);
+                        });
+                    } else {
+                        imagesList.innerHTML = '<div class="text-muted text-center py-3">No se encontraron imágenes.</div>';
+                    }
+                    imagesModal.show();
+                })
+                .catch(err => {
+                    imagesList.innerHTML = `<div class="alert alert-danger mb-0">Error al obtener imágenes: ${err.message}</div>`;
+                    imagesModal.show();
+                });
+            });
+
+            // Delegación de eventos: copiar nombre al campo ImageUrl cuando se hace clic en el nombre o en el botón "Copiar"
+            imagesList.addEventListener('click', function(e) {
+                const target = e.target;
+                if (target.classList.contains('copy-image-name') || target.classList.contains('copy-btn')) {
+                    e.preventDefault();
+                    const filename = target.dataset.name;
+                    if (!filename) return;
+
+                    // buscar el input ImageUrl (por name)
+                    const imageUrlInput = document.querySelector('input[name="ImageUrl"]');
+                    if (imageUrlInput) {
+                        imageUrlInput.value = '/images/products/' + filename;
+                        // mostrar feedback breve
+                        showFeedback(`Ruta copiada: /images/products/${filename}`);
+                    }
+                }
+            });
+
+            function showFeedback(msg) {
+                feedbackContainer.innerHTML = '';
+                const div = document.createElement('div');
+                div.className = 'alert alert-success py-1 mb-0';
+                div.role = 'status';
+                div.id = 'copyFeedback';
+                div.textContent = msg;
+                feedbackContainer.appendChild(div);
+                setTimeout(() => {
+                    if (feedbackContainer.contains(div)) feedbackContainer.removeChild(div);
+                }, 1800);
+            }
+        })();
+    </script>
 }

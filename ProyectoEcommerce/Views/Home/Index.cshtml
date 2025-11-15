@@ -8,118 +8,123 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 }
 
-
-@section Scripts {
-    <!-- API Key CORREGIDA y optimizada -->
-    <script>
-        function loadGoogleMaps() {
-            const script = document.createElement('script');
-                    @*script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyASg-6uv9BAJVu5haLhf3iimD8X1Xhnaas&callback=initMap';*@
-            script.async = true;
-            script.defer = true;
-            document.head.appendChild(script);
-        }
-        window.onload = loadGoogleMaps;
-    </script>
-    <script src="~/js/maps.js" asp-append-version="true"></script>
-}
-
-
-
-
-
-
 <main class="main-content">
     <h1 class="section-title">Productos Destacados</h1>
 
+    @if (Model != null && Model.Any())
+    {
+        var grouped = Model.Select((p, index) => new { p, index })
+        .GroupBy(x => x.index / 3)
+        .ToList();
 
-    <!-- loop  que muestra los productos, crea una tarjeta para cada producto-->
-    <div class="products-grid">
-        @foreach (var item in Model)
-        {
-            <div class="product-card">
-                <!-- Enlace sin Edit ni URL para mostrar al cliente -->
-                <a asp-controller="Products" asp-action="DetailsPublic" asp-route-id="@item.Id" class="product-link">
-                    <div class="product-image">
-                        @{
-                            // Decide la URL de la imagen: externa o local
-                            string imgSrc = string.Empty;
-                            if (!string.IsNullOrEmpty(item.ImageUrl) &&
-                            (item.ImageUrl.StartsWith("http://") || item.ImageUrl.StartsWith("https://")))
-                            {
-                                imgSrc = item.ImageUrl; // URL externa
-                            }
-                            else if (!string.IsNullOrEmpty(item.ImageUrl))
-                            {
-                                // Normaliza rutas locales
-                                var localPath = item.ImageUrl.StartsWith("~")
-                                ? item.ImageUrl
-                                : (item.ImageUrl.StartsWith("/") ? "~" + item.ImageUrl : "~/" + item.ImageUrl.TrimStart('/'));
-                                imgSrc = Url.Content(localPath);
-                            }
-                            else
-                            {
-                                imgSrc = Url.Content("~/images/products/placeholder.jpg");
-                            }
-                        }
+        <div class="carousel-wrapper position-relative">
+            <!-- Carrusel -->
+            <div id="destacadosCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="6000">
 
-                        @if (imgSrc.StartsWith("http"))
-                        {
-                            <img src="@imgSrc" alt="@item.Name" class="card-img" />
-                        }
-                        else
-                        {
-                            <img src="@imgSrc" alt="@item.Name" class="card-img" asp-append-version="true" />
-                        }
-
-                        <div class="product-badge @(item.Available ? "available" : "unavailable")">
-                            @(item.Available ? "Disponible" : "Agotado")
-                        </div>
-                    </div>
-
-                    <div class="product-info-clickable">
-                        <h3 class="product-name">@item.Name</h3>
-                        <p class="product-availability">
-                            <span class="status-indicator @(item.Available ? "" : "unavailable")"></span>
-                            @(item.Available ? $"En stock ({item.Stock} unidades)" : "Sin stock")
-                        </p>
-                        <!-- Para gestionar los precios con coma y 3 decimales...45,250-->
-                        <div class="product-price">₡@item.Price.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</div>
-                    </div>
-                </a>
-
-                <div class="product-actions">
-                    @if (item.Available && item.Stock > 0)
+                <!-- Indicadores -->
+                <div class="carousel-indicators">
+                    @for (var i = 0; i < grouped.Count; i++)
                     {
-                        <a asp-controller="Products" asp-action="DetailsPublic" asp-route-id="@item.Id" class="buy-btn">
-                            Comprar Ahora
-                        </a>
+                        <button type="button" data-bs-target="#destacadosCarousel" data-bs-slide-to="@i"
+                                class="@(i == 0 ? "active" : "")"
+                                aria-current="@(i == 0 ? "true" : "false")"
+                                aria-label="Slide @(i + 1)"></button>
                     }
-                    else
+                </div>
+
+                <div class="carousel-inner">
+                    @for (var i = 0; i < grouped.Count; i++)
                     {
-                        <span class="buy-btn disabled">
-                            Agotado
-                        </span>
+                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                            <div class="row justify-content-center">
+                                @foreach (var item in grouped[i])
+                                {
+                                    <div class="col-md-3">
+                                        <div class="product-card mb-4">
+                                            <a asp-controller="Products" asp-action="DetailsPublic" asp-route-id="@item.p.Id" class="product-link">
+                                                <div class="product-image">
+                                                    @{
+                                                        string imgSrc = string.Empty;
+                                                        if (!string.IsNullOrEmpty(item.p.ImageUrl) &&
+                                                        (item.p.ImageUrl.StartsWith("http://") || item.p.ImageUrl.StartsWith("https://")))
+                                                        {
+                                                            imgSrc = item.p.ImageUrl;
+                                                        }
+                                                        else if (!string.IsNullOrEmpty(item.p.ImageUrl))
+                                                        {
+                                                            var localPath = item.p.ImageUrl.StartsWith("~")
+                                                            ? item.p.ImageUrl
+                                                            : (item.p.ImageUrl.StartsWith("/") ? "~" + item.p.ImageUrl : "~/" + item.p.ImageUrl.TrimStart('/'));
+                                                            imgSrc = Url.Content(localPath);
+                                                        }
+                                                        else
+                                                        {
+                                                            imgSrc = Url.Content("~/images/products/placeholder.jpg");
+                                                        }
+                                                    }
+
+                                                    <img src="@imgSrc" alt="@item.p.Name" class="card-img" asp-append-version="true" loading="lazy" />
+                                                    <div class="product-badge @(item.p.Available ? "available" : "unavailable")">
+                                                        @(item.p.Available ? "Disponible" : "Agotado")
+                                                    </div>
+                                                </div>
+
+                                                <div class="product-info-clickable text-center">
+                                                    <h3 class="product-name">@item.p.Name</h3>
+                                                    <p class="product-availability">
+                                                        @(item.p.Available ? $"En stock ({item.p.Stock} unidades)" : "Sin stock")
+                                                    </p>
+                                                    <div class="product-price">₡@item.p.Price.ToString("N0", System.Globalization.CultureInfo.InvariantCulture)</div>
+                                                </div>
+                                            </a>
+
+                                            <div class="product-actions text-center">
+                                                @if (item.p.Available && item.p.Stock > 0)
+                                                {
+                                                    <a asp-controller="Products" asp-action="DetailsPublic" asp-route-id="@item.p.Id" class="buy-btn">
+                                                        Comprar Ahora
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <span class="buy-btn disabled">Agotado</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
                     }
                 </div>
             </div>
-        }
-    </div>
-        }
-    </div>
 
+            <!-- Controles flotantes en capa externa -->
+            <div class="carousel-controls-overlay">
+                <button class="arrow-left" type="button" data-bs-target="#destacadosCarousel" data-bs-slide="prev" aria-label="Anterior">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="arrow-right" type="button" data-bs-target="#destacadosCarousel" data-bs-slide="next" aria-label="Siguiente">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="text-muted">No hay productos destacados para mostrar.</p>
+    }
 </main>
 
-<img src="~/images/Logos/Whats.png" class="whatsapp-btn" title="Contactar por WhatsApp"></img>
+<hr class="my-5" />
 
+<img src="~/images/Logos/Whats.png" class="whatsapp-btn" title="Contactar por WhatsApp" />
 
-
-<!-- Reseñas de usuarios ( guía visual — sin lógica ) -->
+<!-- Reseñas de usuarios -->
 <section id="user-reviews" class="user-reviews-section container">
     <h2 class="reviews-title">Reseñas de clientes</h2>
 
     <div class="reviews-grid">
-        <!-- Reseña 1 -->
         <article class="review-card" tabindex="0" aria-labelledby="r1-name" aria-describedby="r1-text">
             <header class="review-header">
                 <div class="review-avatar" aria-hidden="true">AJ</div>
@@ -133,7 +138,6 @@
             </div>
         </article>
 
-        <!-- Reseña 2 -->
         <article class="review-card" tabindex="0" aria-labelledby="r2-name" aria-describedby="r2-text">
             <header class="review-header">
                 <div class="review-avatar" aria-hidden="true">CR</div>
@@ -147,7 +151,6 @@
             </div>
         </article>
 
-        <!-- Reseña 3 -->
         <article class="review-card" tabindex="0" aria-labelledby="r3-name" aria-describedby="r3-text">
             <header class="review-header">
                 <div class="review-avatar" aria-hidden="true">ML</div>
@@ -162,93 +165,3 @@
         </article>
     </div>
 </section>
-
-
-
-
-<!-- Mapa + Sucursales -->
-<section class="map-branches container" aria-label="Mapa y sucursales">
-    <h2 class="section-title">ENCUÉNTRANOS</h2>
-
-    <div class="map-branches-grid">
-        <!-- Columna: Mapa -->
-        <div class="map-column">
-            <div class="map-wrapper" role="application" aria-label="Mapa de sucursales">
-                <div id="map">
-                    <div class="map-loading">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>Cargando mapa...</p>
-                    </div>
-                </div>
-                <div class="map-actions">
-                    <button id="locate-me">
-                        <i class="fas fa-location-arrow"></i> Mi ubicación
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Columna: Lista de sucursales -->
-        <aside class="branches-column" aria-labelledby="branches-title">
-            <h3 id="branches-title" class="branches-title">Sucursales disponibles</h3>
-
-            <div class="branches-list">
-                <!-- Sucursal 1 -->
-                <article class="branch-card" tabindex="0" aria-labelledby="branch1-name"
-                         data-lat="10.134533" data-lng="-85.446590" data-branch="central">
-                    <div class="branch-header">
-                        <strong id="branch1-name" class="branch-name">Sucursal Central - Nicoya</strong>
-                        <span class="branch-distance">A 2.1 km</span>
-                    </div>
-                    <div class="branch-body">
-                        <div class="branch-address">Av. Principal 123, Nicoya, Guanacaste</div>
-                        <div class="branch-hours">Horario: Lun - Vie 8:00 - 17:00</div>
-                        <div class="branch-phone">Tel: <a href="tel:+50612345678">+506 1234-5678</a></div>
-                        <div class="branch-payment">Métodos: Tarjeta • Efectivo • PayPal</div>
-                    </div>
-                </article>
-
-                <!-- Sucursal 2 -->
-                <article class="branch-card" tabindex="0" aria-labelledby="branch2-name"
-                         data-lat="10.140000" data-lng="-85.450000" data-branch="plaza">
-                    <div class="branch-header">
-                        <strong id="branch2-name" class="branch-name">Sucursal Plaza Oeste</strong>
-                        <span class="branch-distance">A 12.5 km</span>
-                    </div>
-                    <div class="branch-body">
-                        <div class="branch-address">Centro Comercial Plaza Oeste, Local 5</div>
-                        <div class="branch-hours">Horario: Lun - Sab 9:00 - 18:00</div>
-                        <div class="branch-phone">Tel: <a href="tel:+50687654321">+506 8765-4321</a></div>
-                        <div class="branch-payment">Métodos: Tarjeta • PayPal</div>
-                    </div>
-                </article>
-
-                <!-- Sucursal 3 -->
-                <article class="branch-card" tabindex="0" aria-labelledby="branch3-name"
-                         data-lat="10.120000" data-lng="-85.430000" data-branch="playa">
-                    <div class="branch-header">
-                        <strong id="branch3-name" class="branch-name">Punto Express - Playa</strong>
-                        <span class="branch-distance">A 35 km</span>
-                    </div>
-                    <div class="branch-body">
-                        <div class="branch-address">Ruta 21, Km 4, Local frente a la playa</div>
-                        <div class="branch-hours">Horario: Mar - Dom 10:00 - 20:00</div>
-                        <div class="branch-phone">Tel: <a href="tel:+50644556677">+506 4455-6677</a></div>
-                        <div class="branch-payment">Métodos: Efectivo • Contra entrega</div>
-                    </div>
-                </article>
-            </div>
-
-            <!-- Barra de búsqueda -->
-            <div class="search-box">
-                <input type="text" id="branch-search" placeholder="Escribe aquí para buscar...">
-                <i class="fas fa-search"></i>
-            </div>
-        </aside>
-    </div>
-</section>
-
-
-
-
-

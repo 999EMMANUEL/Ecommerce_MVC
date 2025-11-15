@@ -10,17 +10,14 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
     <link rel="stylesheet" href="~/css/style.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/Accessibility.css" asp-append-version="true" />
-
     @RenderSection("Styles", required: false)
 </head>
 
 <body>
     <header>
         <div class="header-top d-flex align-items-center gap-4 px-3 py-2">
-            <!-- LOGO - Ancho fijo -->
             <div class="logo-container" style="width: 320px; flex-shrink: 0;">
                 <a asp-controller="Home" asp-action="Index" class="logo">
                     <img src="https://i.postimg.cc/K8Kyg8yD/Imagen1.png"
@@ -28,25 +25,26 @@
                 </a>
             </div>
 
-            <!-- BÚSQUEDA - Centrada  -->
-            <div class="search-container d-flex gap-2" style="flex: 1; max-width: 500px; margin: 0 auto;">
-                <input type="text" class="search-bar form-control" placeholder="Buscar productos...">
-                <button class="search-btn btn btn-outline-primary">Buscar</button>
-            </div>
+            <form asp-controller="Products" asp-action="Public" method="get"
+                  class="search-container d-flex gap-2" style="flex: 1; max-width: 500px; margin: 0 auto;">
+                <input type="text" name="searchTerm" class="search-bar form-control" placeholder="Buscar productos..." />
+                <button type="submit" class="search-btn btn btn-outline-primary">Buscar</button>
+            </form>
 
-            <!-- BOTONES - Mismo tamaño y alineados -->
-            <div class="header-actions d-flex align-items-center gap-1" style="width: 300px; flex-shrink: 0; justify-content: flex-end;">
+            <div class="header-actions d-flex align-items-center gap-1"
+                 style="width: 300px; flex-shrink: 0; justify-content: flex-end;">
                 <partial name="_LoginPartial" />
 
-                <a href="#" class="header-btn btn btn-outline-secondary btn-sm" style="min-width: 60px; height: 36px;">
+                <a href="/Favorites" class="header-btn btn btn-outline-secondary btn-sm"
+                   style="min-width: 60px; height: 36px; position: relative;" title="Mis Favoritos">
                     <i class="fas fa-heart" style="font-size: 1.3rem;"></i>
+                    <span class="favorites-badge badge bg-danger" style="position:absolute; top:-5px; right:-5px; font-size:0.6rem; display:none;">0</span>
                 </a>
 
-                <a href="#" class="header-btn btn btn-outline-secondary btn-sm" style="min-width: 60px; height: 36px;">
-                    <i class="fas fa-shopping-cart" style="font-size: 1.3rem;"></i>
-                </a>
+                @await Component.InvokeAsync("CartTodo")
 
-                <button id="btnAccessibility" class="header-btn btn btn-outline-secondary btn-sm" style="min-width: 60px; height: 36px;">
+                <button id="btnAccessibility" class="header-btn btn btn-outline-secondary btn-sm"
+                        style="min-width:60px; height:36px;">
                     <i class="fas fa-universal-access" style="font-size: 1.3rem;"></i>
                 </button>
             </div>
@@ -55,11 +53,8 @@
         <nav class="navigation border-top">
             <div class="nav-container container d-flex align-items-center gap-3 py-2">
                 <div class="categories-dropdown dropdown">
-                    <button class="categories-btn btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        Categorías
-                    </button>
+                    <button class="categories-btn btn btn-light dropdown-toggle" data-bs-toggle="dropdown">Categorías</button>
                     <ul class="dropdown-menu" id="categoriesMenu">
-                        <!-- Se carga dinamico con JavaScript -->
                         <li><div class="dropdown-item text-muted">Cargando categorías...</div></li>
                     </ul>
                 </div>
@@ -69,61 +64,41 @@
                 <a class="nav-link" asp-controller="Promotions" asp-action="Index">PROMOCIONES</a>
                 <a class="nav-link" asp-controller="Contact" asp-action="Index">CONTÁCTENOS</a>
 
-                <!-- ============================================ -->
-                <!-- MENÚ DE ADMINISTRADOR - SOLO PARA ADMINS -->
-                <!-- ============================================ -->
                 @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                 {
                     <div class="dropdown">
                         <button class="btn btn-danger dropdown-toggle text-uppercase fw-semibold"
-                                type="button" id="adminMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                                type="button" id="adminMenu" data-bs-toggle="dropdown">
                             Administrador
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="adminMenu">
-                            <!-- Panel de Control -->
-                            <li>
-                                <a class="dropdown-item"
-                                   asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                                     Panel
-                                </a>
-                            </li>
+
+                            <li><a class="dropdown-item" asp-controller="AdminUsers" asp-action="Index">Gestión de Usuarios y Roles</a></li>
                             <li><hr class="dropdown-divider" /></li>
 
-                            <!-- ⭐ GESTIÓN DE USUARIOS Y ROLES - ESTO ES LO IMPORTANTE ⭐ -->
-                            <li>
-                                <a class="dropdown-item" asp-controller="AdminUsers" asp-action="Index">
-                                     Gestión de Usuarios y Roles
-                                </a>
-                            </li>
+                            <li><a class="dropdown-item" asp-controller="Products" asp-action="Index">Productos</a></li>
+                            <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index">Categorías</a></li>
                             <li><hr class="dropdown-divider" /></li>
 
-                            <!-- Catálogo -->
-                            <li><a class="dropdown-item" asp-controller="Products" asp-action="Index"> Productos</a></li>
-                            <li><a class="dropdown-item" asp-controller="Categories" asp-action="Index"> Categorías</a></li>
+                            <li><a class="dropdown-item" asp-controller="Customers" asp-action="Index">Clientes</a></li>
+                            <li><a class="dropdown-item" asp-controller="Employees" asp-action="Index">Empleados</a></li>
                             <li><hr class="dropdown-divider" /></li>
 
-                            <!-- Personas -->
-                            <li><a class="dropdown-item" asp-controller="Customers" asp-action="Index"> Clientes</a></li>
-                            <li><a class="dropdown-item" asp-controller="Employees" asp-action="Index"> Empleados</a></li>
+                            <li><a class="dropdown-item" asp-controller="Buys" asp-action="Index">Compras</a></li>
+                            <li><a class="dropdown-item" asp-controller="ShoppingCarts" asp-action="Index">Carritos</a></li>
                             <li><hr class="dropdown-divider" /></li>
 
-                            <!-- Operaciones -->
-                            <li><a class="dropdown-item" asp-controller="Buys" asp-action="Index"> Compras</a></li>
-                            <li><a class="dropdown-item" asp-controller="ShoppingCarts" asp-action="Index"> Carritos</a></li>
-                            <li><hr class="dropdown-divider" /></li>
+                            <li><a class="dropdown-item" asp-controller="Faqs" asp-action="Index">FAQs</a></li>
+                            <li><a class="dropdown-item" asp-controller="Promotions" asp-action="Index">Promociones</a></li>
 
-                            <!-- Contenido -->
-                            <li><a class="dropdown-item" asp-controller="Faqs" asp-action="Index"> FAQs</a></li>
+                            <li><a class="dropdown-item" asp-controller="Coupons" asp-action="Index">Cupones</a></li>
                         </ul>
                     </div>
                 }
 
-                <!-- ============================================ -->
-                <!-- MENÚ DE CUENTA - PARA TODOS LOS USUARIOS -->
-                <!-- ============================================ -->
                 <div class="dropdown">
                     <button class="btn btn-light btn-sm dropdown-toggle fw-semibold"
-                            type="button" id="accountMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                            id="accountMenu" data-bs-toggle="dropdown">
                         @(SignInManager.IsSignedIn(User) ? "Mi cuenta" : "Cuenta")
                     </button>
 
@@ -131,54 +106,27 @@
                     {
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountMenu">
                             <li class="dropdown-header">@User.Identity?.Name</li>
-                            <li>
-                                <a class="dropdown-item" asp-controller="Customers" asp-action="Perfil">
-                                     Mi Perfil
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" asp-controller="Buys" asp-action="My">
-                                     Mis Compras
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" asp-controller="ShoppingCarts" asp-action="My">
-                                     Mi Carrito
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">
-                                     Configuración
-                                </a>
-                            </li>
+                            <li><a class="dropdown-item" asp-controller="Customers" asp-action="Perfil">Mi Perfil</a></li>
+                            <li><a class="dropdown-item" asp-controller="Buys" asp-action="My">Mis Compras</a></li>
+                            <li><a class="dropdown-item" asp-controller="ShoppingCarts" asp-action="My">Mi Carrito</a></li>
+                            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Configuración</a></li>
                             <li><hr class="dropdown-divider" /></li>
                             <li>
                                 <form asp-area="Identity" asp-page="/Account/Logout" method="post"
                                       asp-route-returnUrl="@Url.Action("Index", "Home")" class="px-3 py-1">
-                                    <button class="btn btn-outline-danger w-100 btn-sm">
-                                         Salir
-                                    </button>
+                                    <button class="btn btn-outline-danger w-100 btn-sm">Salir</button>
                                 </form>
                             </li>
                         </ul>
                     }
                     else
                     {
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountMenu">
-                            <li>
-                                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login">
-                                    🔑 Ingresar
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">
-                                    📝 Registrarse
-                                </a>
-                            </li>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Login">🔑 Ingresar</a></li>
+                            <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Register">📝 Registrarse</a></li>
                         </ul>
                     }
                 </div>
-
             </div>
         </nav>
     </header>
@@ -191,44 +139,31 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            <div class="footer-content">
-                <p>
-                    &copy; 2025 - InnovaTech -
-                    <a asp-area="" asp-controller="Home" asp-action="Privacy">Políticas y privacidad</a> |
-                    <a asp-area="" asp-controller="Home" asp-action="LegalInformation">Información legal</a> |
-                    <a asp-area="" asp-controller="Home" asp-action="SocialMedia">Redes sociales</a>
-                </p>
+            <div class="row">
+                <div class="col-md-6">
+                    <p>
+                        &copy; 2025 - InnovaTech -
+                        <a asp-controller="Home" asp-action="Privacy">Políticas y privacidad</a> |
+                        <a asp-controller="Home" asp-action="LegalInformation">Información legal</a> |
+                        <a asp-controller="Home" asp-action="SocialMedia">Redes sociales</a>
+                    </p>
+                </div>
+
+                <div class="col-md-6 text-md-end">
+                    <h6 class="mb-2">NUESTRAS TIENDAS:</h6>
+                    <a href="/ContactSucursales?branch=central" class="text-muted text-decoration-none me-3">
+                        <i class="fas fa-store me-1"></i>Nicoya Central
+                    </a>
+                    <a href="/ContactSucursales?branch=oeste" class="text-muted text-decoration-none me-3">
+                        <i class="fas fa-store me-1"></i>Plaza Oeste
+                    </a>
+                    <a href="/ContactSucursales?branch=playa" class="text-muted text-decoration-none">
+                        <i class="fas fa-store me-1"></i>Punto Express Playa
+                    </a>
+                </div>
             </div>
         </div>
     </footer>
-
-    <!-- Panel de accesibilidad -->
-    <div class="accessibility-panel" id="accessibilityPanel" role="dialog" aria-modal="false">
-        <div class="accessibility-options" id="accessibilityOptions">
-            <div class="option-group">
-                <h4>Tamaño de texto</h4>
-                <div class="btn-group">
-                    <button id="font-small" class="font-size-btn btn btn-sm btn-light">A-</button>
-                    <button id="font-normal" class="font-size-btn btn btn-sm btn-light active">A</button>
-                    <button id="font-large" class="font-size-btn btn btn-sm btn-light">A+</button>
-                    <button id="font-xlarge" class="font-size-btn btn btn-sm btn-light">A++</button>
-                </div>
-            </div>
-
-            <div class="option-group">
-                <h4>Contraste</h4>
-                <div class="btn-group">
-                    <button id="contrast-normal" class="contrast-btn btn btn-sm btn-light active">Normal</button>
-                    <button id="contrast-high" class="contrast-btn btn btn-sm btn-light">Alto</button>
-                    <button id="contrast-inverted" class="contrast-btn btn btn-sm btn-light">Invertido</button>
-                </div>
-            </div>
-
-            <div class="option-group">
-                <button id="reset-accessibility" class="btn btn-sm btn-outline-secondary">Restablecer</button>
-            </div>
-        </div>
-    </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
